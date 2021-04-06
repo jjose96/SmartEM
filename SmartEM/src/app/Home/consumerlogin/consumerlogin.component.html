@@ -1,1 +1,23 @@
-<p>consumerlogin works!</p>
+<div class="arr">
+    <div class="card">
+        <h3 class="card-header stylish-color-dark lighten-1 white-text text-uppercase font-weight-bold text-center py-5">CONSUMER LOGIN</h3>
+        <div class="card-body aaa">
+            <form method="POST" #userlogin="ngForm" (ngSubmit)="OnSubmit(userlogin.value)">
+                <div class="md-form input-with-post-icon">
+                    <i class="fas fa-user input-prefix"></i>
+                    <input type="text" id="suffixInside" class="form-control" name="username" ngModel>
+                    <label for="suffixInside">Consumer Id </label>
+                </div>
+                <div class="md-form input-with-post-icon">
+                    <i class="fas fa-lock input-prefix"></i>
+                    <input type="password" id="inputValidationEx2" class="form-control validate" name="password" ngModel>
+                    <label for="inputValidationEx2" data-error="wrong" data-success="right">Password</label>
+                </div>
+                <input type="submit" class="btn btn-primary" value="Login">
+            </form>
+            <div style="margin-top: 10px;"></div>
+            <a href="/">Forgot my password</a><br><br>
+            <button routerLink="/board" class="btn btn-danger">Go to Board Login</button>
+        </div>
+    </div>
+</div>
