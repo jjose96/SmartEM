@@ -1,0 +1,14 @@
+<div *ngIf="status==1">
+
+  <div class="row flex-column-reverse flex-md-row">
+    <div class="col-2">
+      <app-sidebardash></app-sidebardash>
+    </div>
+    <div class="col-md-10 arran">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+<div *ngIf="status==0" style="text-align: center; margin-top:250px">
+  <h1> Redirecting..............</h1>
+</div>

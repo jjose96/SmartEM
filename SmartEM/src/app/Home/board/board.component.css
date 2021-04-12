@@ -1,0 +1,33 @@
+.arr{
+  margin-left:60%;
+  padding-top:10%;
+  margin-right:40px;
+}
+.aaa{
+  margin-left: 10%;
+  margin-right: 20%;
+
+}
+.rnd{
+  border-radius: 25%;
+}
+.spc{
+  margin-left: 5%;
+   background-color: white;
+}
+@media only screen and (max-width: 900px) {
+  .arr{
+    margin-left:2%;
+    padding-top:20%;
+    margin-right:3%;
+  }
+  .aaa{
+    margin-left: 0%;
+    margin-right: 0%;
+
+  }
+
+  .spc{
+    margin-left: 0px;
+  }
+}

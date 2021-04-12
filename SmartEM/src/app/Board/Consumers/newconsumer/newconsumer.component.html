@@ -1,0 +1,51 @@
+ <div class="check">
+  <a routerLink="new" class="btn btn-primary sizebtn btn-lg">New Consumer Registration</a>
+</div>
+<br>
+ <!-- Editable table -->
+<div class="card">
+  <h3 class="card-header text-center font-weight-bold text-uppercase py-4">Consumers</h3>
+  <div class="card-body">
+    <div id="table" class="table-editable">
+      <span class="table-add float-right mb-3 mr-2">
+
+      </span>
+      <table class="table table-bordered table-responsive-md table-striped text-center">
+        <tr>
+          <th class="text-center">Name</th>
+          <th class="text-center">CosumerId</th>
+          <th class="text-center">Email</th>
+          <th class="text-center">Phone</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Remove</th>
+        </tr>
+        <tr *ngFor="let person of personList; let id = index">
+          <td>
+            <span (keyup)="changeValue(id, 'name', $event)" (blur)="updateList(id, 'name', $event)" contenteditable="true">{{person.firstname}} {{person.lastname}}</span>
+          </td>
+          <td>
+            <span contenteditable="true" (keyup)="changeValue(id, 'age', $event)" (blur)="updateList(id, 'age', $event)">{{person.username}}</span>
+          </td>
+          <td>
+            <span contenteditable="true" (keyup)="changeValue(id, 'companyName', $event)" (blur)="updateList(id, 'companyName', $event)">{{person.email}}</span>
+          </td>
+          <td>
+            <span contenteditable="true" (keyup)="changeValue(id, 'city', $event)" (blur)="updateList(id, 'city', $event)">{{person.phone}}</span>
+          </td>
+          <td *ngIf="person.status==0">
+            <span contenteditable="true" (keyup)="changeValue(id, 'city', $event)" (blur)="updateList(id, 'city', $event)" *ngIf="person.status==0">{{inact}}</span>
+          </td>
+          <td *ngIf="person.status==1">
+            <span contenteditable="true" (keyup)="changeValue(id, 'city', $event)" (blur)="updateList(id, 'city', $event)" *ngIf="person.status==1">{{act}}</span>
+          </td>
+          <td>
+            <span class="table-remove">
+              <button type="button" class="btn btn-primary" color="danger" rounded="true" size="sm" (click)="remove(id,person.username)">Remove</button>
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- Editable table -->
