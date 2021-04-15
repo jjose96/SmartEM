@@ -33,27 +33,16 @@ const accessTokenSecret = 'youraccesstokensecret';
 const consumerTokenSecret = 'newtokenundreadable';
 
 function authenticateToken(req, res, next) {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1]
-  if (token == null) return res.sendStatus(401)
-
-  jwt.verify(token, accessTokenSecret, (err, user) => {
-    if (err) return res.status(200).json({"status":"0"})
-    req.user = user.board
-    next()
-  })
-
-    // Gather the jwt access token from the request header
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.sendStatus(401) // if there isn't any token
+    if (token == null) return res.sendStatus(401)
 
     jwt.verify(token, accessTokenSecret, (err, user) => {
         if (err) return res.status(200).json({ "status": "0" })
         req.user = user.board
-        next() // pass the execution off to whatever request the client intended
+        next()
     })
-  }
+}
 
 function conAuth(req, res, next) {
     // Gather the jwt access token from the request header
@@ -213,4 +202,4 @@ app.post("/api/userInfo", conAuth, function(req, res) {
         });
 });
 
-app.listen(process.env.PORT || 8080);
+app.listen(3000);

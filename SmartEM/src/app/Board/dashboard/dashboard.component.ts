@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -8,17 +7,19 @@ import { Component, OnInit } from '@angular/core';
 export class DashboardComponent implements OnInit {
 
   constructor() {
+    // tslint:disable-next-line:only-arrow-functions
     (function()
 {
-  if( window.localStorage )
+  if ( window.localStorage )
   {
-    if( !localStorage.getItem('firstLoad') )
+    if ( !localStorage.getItem('firstLoad') )
     {
-      localStorage['firstLoad'] = true;
+      localStorage.firstLoad = true;
       window.location.reload();
     }
-    else
+    else {
       localStorage.removeItem('firstLoad');
+    }
   }
 })();
   }
