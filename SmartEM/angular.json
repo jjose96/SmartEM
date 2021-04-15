@@ -27,7 +27,6 @@
                             "src/styles.css"
                         ],
                         "scripts": [
-                            "src/assets/chart.js",
                             "src/assets/test.js"
                         ]
                     },
