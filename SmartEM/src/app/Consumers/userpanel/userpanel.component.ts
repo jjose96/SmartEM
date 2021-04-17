@@ -1,6 +1,7 @@
 import { HttpClient,HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { environment } from "../../../environments/environment";
+import * as $ from 'jquery';
 @Component({
   selector: 'app-userpanel',
   templateUrl: './userpanel.component.html',
@@ -26,6 +27,7 @@ export class UserpanelComponent implements OnInit {
       }
       else{}
   });
+    // tslint:disable-next-line:variable-name
 }
 
 
