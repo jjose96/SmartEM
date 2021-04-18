@@ -9,7 +9,6 @@
         "lint": "ng lint",
         "e2e": "ng e2e",
         "heroku-postbuild": "ng build --prod"
-
     },
     "private": true,
     "dependencies": {
@@ -21,10 +20,16 @@
         "@angular/platform-browser": "~9.1.9",
         "@angular/platform-browser-dynamic": "~9.1.9",
         "@angular/router": "~9.1.9",
+        "@angular/cli": "9.1.12",
+        "bootstrap": "^4.6.0",
+        "cookie-parser": "^1.4.5",
         "cors": "^2.8.5",
-        "firebase-admin": "^9.6.0",
-        "jquery": "^3.6.0",
-        "jsonwebtoken": "^8.5.1",
+        "express": "^4.17.1",
+        "express-session": "^1.17.1",
+        "firebase": "^7.24.0",
+        "firebase-admin": "^9.3.0",
+        "jquery": "^3.5.1",
+        "mdbootstrap": "^4.19.2",
         "rxjs": "~6.5.4",
         "tslib": "^1.10.0",
         "zone.js": "~0.10.2"
