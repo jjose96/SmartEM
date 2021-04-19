@@ -21,6 +21,8 @@ import { BillComponent } from './Consumers/bill/bill.component';
 import { ConsumerpendingComponent } from './Board/Consumers/consumerpending/consumerpending.component';
 import { ProfileComponent } from './Consumers/profile/profile.component';
 import { BillsComponent } from './Board/bills/bills.component';
+import * as Chart from 'chart.js';
+
 
 
 const routes: Routes = [
