@@ -3,6 +3,8 @@ const path = require('path')
 var cors = require('cors')
 const app = express();
 const jwt = require('jsonwebtoken');
+var nodemailer = require('nodemailer');
+const sendmail = require('sendmail')();
 app.use(cors());
 const body_parser = require('body-parser');
 app.use(body_parser.json());
@@ -202,4 +204,17 @@ app.post("/api/userInfo", conAuth, function(req, res) {
         });
 });
 
+app.post("/api/mail", function(req, res) {
+
+  sendmail({
+    from: 'test@finra.org',
+    to: 'jekenod696@zcai55.com',
+    subject: 'Hello World',
+    html: 'Mail of test sendmail '
+  }, function (err, reply) {
+    console.log(err && err.stack)
+    console.dir(reply)
+  })
+res.status(200).json({'status': "success"})
+});
 app.listen(3000);
