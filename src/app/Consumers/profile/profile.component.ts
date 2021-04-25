@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  status = 0;
+  status;
   consumerId;
   firstname;
   lastname;
@@ -32,7 +32,18 @@ export class ProfileComponent implements OnInit {
            this.pincode = result.pincode;
   });
   }
-
+  OnSubmit(data){
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+    headers = headers.set('Authorization', 'Bearer ' + token);
+    this.http.post<any>(environment.url + '/api/ProfileUpdate'
+      // tslint:disable-next-line:max-line-length
+      , {firstname: data.firstname, lastname: data.lastname, email: data.email, phone: data.phone, address: data.address, city: data.city, pincode: data.pincode}
+      , {headers})
+      .subscribe(result => {
+        status = result.status;
+    });
+  }
   ngOnInit(): void {
   }
 

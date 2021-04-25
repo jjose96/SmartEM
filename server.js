@@ -108,22 +108,6 @@ app.post('/api/ConsumerReg', authenticateToken, function(req, res) {
         phone: phone,
         board: req.user,
         status: 0
-    })
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
-        auth: {
-            user: 'estella.thiel57@ethereal.email',
-            pass: 'r9bU6tK1aeCq9Qgxfb'
-        }
-    });
-
-    // send email
-    transporter.sendMail({
-        from: 'estella.thiel57@ethereal.email',
-        to: 'josephjose967@gmail.com',
-        subject: 'Test Email Subject',
-        html: '<h1>Example HTML Message Body</h1>'
     });
 
 });
@@ -217,7 +201,6 @@ app.post("/api/mail", function(req, res) {
 
 app.post("/api/profileInfo", conAuth, function(req, res) {
     let UserRef = db.collection('Users').where("username", "==", req.con);
-    let Profile = []
     UserRef.get()
         .then(function(q) {
             q.forEach(function(doc) {
@@ -228,5 +211,31 @@ app.post("/api/profileInfo", conAuth, function(req, res) {
                 }
             });
         });
+});
+app.post('/api/ProfileUpdate', conAuth, function(req, res) {
+    let UserRef = db.collection('Users').where("username", "==", req.con);
+    var firstname = req.body.firstname;
+    var lastname = req.body.lastname;
+    var address = req.body.address
+    var city = req.body.city
+    var email = req.body.email;
+    var phone = req.body.phone;
+    var pincode = req.body.pincode;
+    UserRef.get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                db.collection('Users').doc(doc.id).update({
+                    firstname: firstname,
+                    lastname: lastname,
+                    address: address,
+                    city: city,
+                    pincode: pincode,
+                    email: email,
+                    phone: phone,
+                });
+            });
+        });
+    res.status(200).json({ 'status': 1 });
+
 });
 app.listen(3000);
