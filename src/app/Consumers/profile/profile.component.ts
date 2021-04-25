@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  status;
+  status:number;
   consumerId;
   firstname;
   lastname;
@@ -31,6 +31,7 @@ export class ProfileComponent implements OnInit {
            this.phone = result.phone;
            this.pincode = result.pincode;
   });
+
   }
   OnSubmit(data){
     const token = localStorage.getItem('token');
