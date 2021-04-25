@@ -3,7 +3,6 @@ const path = require('path')
 var cors = require('cors')
 const app = express();
 const jwt = require('jsonwebtoken');
-var nodemailer = require('nodemailer');
 const sendmail = require('sendmail')();
 app.use(cors());
 const body_parser = require('body-parser');
@@ -170,14 +169,12 @@ app.post('/api/RemoveConsumerUserInfo', authenticateToken, function(req, res) {
 app.post('/api/login', function(req, res) {
     var user = req.body.username;
     var pass = req.body.password;
-    console.log(user, pass);
     var status = 0;
     let UserRef = db.collection('Users').where("username", "==", user).where("password", "==", pass);
     UserRef.get()
         .then(function(q) {
             q.forEach(function(doc) {
                 if (doc.exists) {
-                    console.log("hello")
                     const accessToken = jwt.sign({ consumerId: doc.data().username }, consumerTokenSecret);
                     res.status(200).json({ "status": "1", "auth": accessToken })
                     status = 1
@@ -206,15 +203,30 @@ app.post("/api/userInfo", conAuth, function(req, res) {
 
 app.post("/api/mail", function(req, res) {
 
-  sendmail({
-    from: 'test@finra.org',
-    to: 'jekenod696@zcai55.com',
-    subject: 'Hello World',
-    html: 'Mail of test sendmail '
-  }, function (err, reply) {
-    console.log(err && err.stack)
-    console.dir(reply)
-  })
-res.status(200).json({'status': "success"})
+    sendmail({
+        from: 'test@finra.org',
+        to: 'jekenod696@zcai55.com',
+        subject: 'Hello World',
+        html: 'Mail of test sendmail '
+    }, function(err, reply) {
+        console.log(err && err.stack)
+        console.dir(reply)
+    })
+    res.status(200).json({ 'status': "success" })
+});
+
+app.post("/api/profileInfo", conAuth, function(req, res) {
+    let UserRef = db.collection('Users').where("username", "==", req.con);
+    let Profile = []
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    res.status(200).json({ 'consumerId': doc.data().username, 'firstname': doc.data().firstname, 'lastname': doc.data().lastname, 'email': doc.data().email, 'phone': doc.data().phone, 'address': doc.data().address, 'city': doc.data().city, 'pincode': doc.data().pincode });
+                } else {
+                    res.status(200).json({ 'status': 0, name: 'invalid user' });
+                }
+            });
+        });
 });
 app.listen(3000);

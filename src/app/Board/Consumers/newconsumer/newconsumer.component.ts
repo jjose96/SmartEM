@@ -7,7 +7,7 @@ import { environment } from "../../../../environments/environment";
   styleUrls: ['./newconsumer.component.css']
 })
 export class NewconsumerComponent implements OnInit {
-  personList: Array<any>
+  personList: Array<any>;
   act="active";
   inact= "Inactive"
   constructor(private http: HttpClient) {
