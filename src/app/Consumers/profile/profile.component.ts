@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  status:number;
+  status: number;
   consumerId;
   firstname;
   lastname;

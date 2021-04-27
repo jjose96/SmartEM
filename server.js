@@ -22,7 +22,7 @@ app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store')
     next()
 })
-app.use(express.static(path.join(__dirname, '/dist/SmartE')));
+app.use(express.static(path.join(__dirname, '/dist/SmartEM')));
 
 app.get('/*', function(req, res) {
 
@@ -232,6 +232,21 @@ app.post('/api/ProfileUpdate', conAuth, function(req, res) {
                     pincode: pincode,
                     email: email,
                     phone: phone,
+                });
+            });
+        });
+    res.status(200).json({ 'status': 1 });
+
+});
+app.post('/api/PasswordChange', conAuth, function(req, res) {
+    var cpass = req.body.password;
+    var npass = req.body.newpassword;
+    let UserRef = db.collection('Users').where("username", "==", req.con).where("password", "==", cpass);
+    UserRef.get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                db.collection('Users').doc(doc.id).update({
+                    password: npass
                 });
             });
         });

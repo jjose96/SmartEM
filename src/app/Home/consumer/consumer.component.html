@@ -2,6 +2,9 @@
     <div class="card">
         <h3 class="card-header stylish-color-dark lighten-1 white-text text-uppercase font-weight-bold text-center py-5">CONSUMER LOGIN</h3>
         <div class="card-body aaa">
+            <div class="alert alert-danger" role="alert" *ngIf="state==0">
+                Username or password is invalid ! Try again
+            </div>
             <form method="POST" #userlogin="ngForm" (ngSubmit)="OnSubmit(userlogin.value)">
                 <div class="md-form input-with-post-icon">
                     <i class="fas fa-user input-prefix"></i>
