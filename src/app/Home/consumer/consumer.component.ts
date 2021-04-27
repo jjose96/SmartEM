@@ -8,8 +8,7 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./consumer.component.css']
 })
 export class ConsumerComponent implements OnInit {
-  state: number;
-
+   state = 1;
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
@@ -17,7 +16,10 @@ export class ConsumerComponent implements OnInit {
   OnSubmit(data){
     this.http.post<any>(environment.url + '/api/login', { username: data.username,
      password: data.password }).subscribe(result => {
-      if (result.status === 1){
+      console.log(result.status);
+      // tslint:disable-next-line:triple-equals
+      if (result.status == 1){
+              console.log(result.status);
               localStorage.setItem('token', result.auth);
               location.replace('/userpanel');
             }

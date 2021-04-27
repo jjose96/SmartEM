@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./board.component.css']
 })
 export class BoardComponent implements OnInit {
-  state: number;
+  state = 1;
 
   constructor(private http: HttpClient) {
   }

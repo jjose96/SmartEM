@@ -505,3 +505,9 @@ body {
 .chiller-theme .sidebar-footer>a:last-child {
     border-right: none;
 }
+
+@media screen and (max-width: 768px) {
+    .page-wrapper {
+        height: 100%;
+    }
+}
