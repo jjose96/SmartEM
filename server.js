@@ -12,7 +12,6 @@ app.use(body_parser.urlencoded({
 }));
 var admin = require("firebase-admin");
 var serviceAccount = require("./smarte-8f70f-firebase-adminsdk-dc8il-f047b8760f.json");
-const { ElementSchemaRegistry } = require('@angular/compiler');
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://smarte-8f70f.firebaseio.com"
@@ -26,7 +25,7 @@ app.use(express.static(path.join(__dirname, '/dist/SmartEM')));
 
 app.get('/*', function(req, res) {
 
-    res.sendFile(path.join(__dirname + '/dist/SmartE/index.html'));
+    res.sendFile(path.join(__dirname + '/dist/SmartEM/index.html'));
 });
 
 
