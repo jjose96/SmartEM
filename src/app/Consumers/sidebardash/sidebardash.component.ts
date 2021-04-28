@@ -28,6 +28,7 @@ export class SidebardashComponent implements OnInit {
 
 OnLogout(){
   localStorage.removeItem('token');
+  localStorage.removeItem('user');
   location.replace('/');
 }
 

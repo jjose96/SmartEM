@@ -21,6 +21,7 @@ export class ConsumerComponent implements OnInit {
       if (result.status == 1){
               console.log(result.status);
               localStorage.setItem('token', result.auth);
+              localStorage.setItem('user', 'consumer');
               location.replace('/userpanel');
             }
             else{

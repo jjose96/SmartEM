@@ -19,6 +19,7 @@ export class BoardComponent implements OnInit {
      password: data.password }).subscribe(result => {
       if (result.status === 1){
               localStorage.setItem('token', result.auth);
+              localStorage.setItem('user', 'board');
               location.replace('/dashboard');
             }
             else{

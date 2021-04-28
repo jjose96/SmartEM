@@ -7,8 +7,15 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./home-page.component.css']
 })
 export class HomePageComponent implements OnInit {
-
-  constructor(private http: HttpClient) { }
+state = 1;
+  constructor(private http: HttpClient) {
+     const user = localStorage.getItem('user');
+     if (user === 'consumer'){
+       this.state = 0;
+       location.replace('/userpanel');
+     }
+     console.log(this.state);
+  }
   ngOnInit(): void {
   }
   OnSubmit(data){
