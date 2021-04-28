@@ -252,4 +252,44 @@ app.post('/api/PasswordChange', conAuth, function(req, res) {
     res.status(200).json({ 'status': 1 });
 
 });
+
+app.post('/api/ReadingStatus', function(req, res) {
+    var board = req.body.board;
+    var consumerid = req.body.consumerid;
+    var unit = req.body.unit;
+    var date = new Date();
+    var time = req.body.time;
+    db.collection("Consumption").add({
+        board: board,
+        consumerid: consumerid,
+        unit: unit,
+        date: date,
+        time: time
+    });
+    res.status(200).json({ 'status': 1 });
+});
+
+app.post('/api/ConsumerDashboard', function(req, res) {
+    var today = (new Date()).toLocaleDateString();
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    var yunit = 0;
+    let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
+    UserRef.where("date", "==", yesterday.toLocaleDateString()).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                yunit = doc.data().unit
+                console.log(yunit)
+            });
+        });
+    UserRef.where("date", "==", today).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                console.log(doc.data().unit - yunit)
+            });
+        });
+    res.status(200).json({ 'status': 1 });
+
+});
+
 app.listen(process.env.PORT || 3000);
