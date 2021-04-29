@@ -25,7 +25,7 @@ export class ConsumerComponent implements OnInit {
               location.replace('/userpanel');
             }
             else{
-              if (result.status === 0){
+              if (result.status == 0){
                 this.state = 0;
               }
             }

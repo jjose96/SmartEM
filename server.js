@@ -256,39 +256,40 @@ app.post('/api/PasswordChange', conAuth, function(req, res) {
 app.post('/api/ReadingStatus', function(req, res) {
     var board = req.body.board;
     var consumerid = req.body.consumerid;
-    var unit = req.body.unit;
-    var date = new Date();
-    var time = req.body.time;
+    var unit = parseInt(req.body.unit);
+    var date = new Date(req.body.date);
     db.collection("Consumption").add({
         board: board,
         consumerid: consumerid,
         unit: unit,
         date: date,
-        time: time
     });
     res.status(200).json({ 'status': 1 });
 });
 
 app.post('/api/ConsumerDashboard', function(req, res) {
-    var today = (new Date()).toLocaleDateString();
+    var today = new Date();
     const yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
     var yunit = 0;
+    tunit = 0;
+    console.log(today.toISOString().split('.')[0])
     let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
-    UserRef.where("date", "==", yesterday.toLocaleDateString()).get()
+    UserRef.where("date", "==", yesterday.toISOString().split('.')[0]).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 yunit = doc.data().unit
                 console.log(yunit)
             });
         });
-    UserRef.where("date", "==", today).get()
+    UserRef.where("date", "==", today.toISOString().split('.')[0]).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 console.log(doc.data().unit - yunit)
+                tunit = doc.data().unit - yunit;
             });
         });
-    res.status(200).json({ 'status': 1 });
+    res.status(200).json({ 'status': 1, 'unit': tunit });
 
 });
 
