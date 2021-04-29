@@ -17,13 +17,15 @@ export class BoardComponent implements OnInit {
   OnSubmit(data){
     this.http.post<any>(environment.url + '/api/blogin', { username: data.username,
      password: data.password }).subscribe(result => {
-      if (result.status === 1){
+      // tslint:disable-next-line:triple-equals
+      if (result.status == 1){
               localStorage.setItem('token', result.auth);
               localStorage.setItem('user', 'board');
               location.replace('/dashboard');
             }
             else{
-              if (result.status === 0){
+              // tslint:disable-next-line:triple-equals
+              if (result.status == 0){
                 this.state = 0;
               }
             }
