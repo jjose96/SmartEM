@@ -289,22 +289,61 @@ app.post('/api/ReadingStatus', function(req, res) {
     });
     res.status(200).json({ 'status': 1 });
 });
-
 app.post('/api/ConsumerDashboard', function(req, res) {
-    var today = new Date();
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
     var yunit = 0;
     tunit = 0;
-    let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
-    UserRef.where("date", ">=", yesterday.toISOString().split('.')[0]).where("date", "<=", today.toISOString().split('.')[0]).get()
-        .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                console.log(doc.data())
+    var d = new Date();
+    var m = new Date();
+    let storeday = []
+    let storemonth = []
+    let todayunit;
+    d.setDate(d.getDate() - 1);
+    n = d.getDate()
+    m.setDate(d.getDate() - n + 1);
+    console.log(n, m)
+    db.collection("ConDashboard").where("consumerid", "==", 123456789).get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    console.log(doc.data())
+                    doc.ref.delete();
+                }
             });
         });
-    res.status(200).json({ 'status': 1, 'unit': tunit });
-
+    const todayAsTimestamp = admin.firestore.Timestamp.now()
+    var yesterday = admin.firestore.Timestamp.fromDate(d)
+    var month = admin.firestore.Timestamp.fromDate(m)
+    let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
+    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                storeday.push(doc.data().unit)
+            });
+            todayunit = storeday[1] - storeday[0]
+            db.collection('ConDashboard').add({
+                consumerid: 123456789,
+                today: todayunit
+            })
+        });
+    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                storemonth.push(doc.data().unit)
+            });
+            monthunit = storemonth[storemonth.length - 1] - storemonth[0]
+            console.log(monthunit);
+            db.collection("ConDashboard").where("consumerid", "==", 123456789).get()
+                .then(function(q) {
+                    q.forEach(function(doc) {
+                        if (doc.exists) {
+                            db.collection('ConDashboard').doc(doc.id).set({
+                                month: monthunit
+                            }, { merge: true })
+                        }
+                    });
+                });
+        });
+    res.status(200).json({ 'status': 1, 'unit': todayunit });
 });
 
 app.listen(process.env.PORT || 3000);
