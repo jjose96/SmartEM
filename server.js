@@ -109,6 +109,9 @@ app.post('/api/ConsumerReg', authenticateToken, function(req, res) {
         board: req.user,
         status: 0
     });
+    db.collection("ConDashboard").add({
+        username: username,
+    });
 
 });
 
@@ -289,7 +292,7 @@ app.post('/api/ReadingStatus', function(req, res) {
     });
     res.status(200).json({ 'status': 1 });
 });
-app.post('/api/ConsumerDashboard', function(req, res) {
+app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     var yunit = 0;
     tunit = 0;
     var d = new Date();
@@ -300,39 +303,37 @@ app.post('/api/ConsumerDashboard', function(req, res) {
     d.setDate(d.getDate() - 1);
     n = d.getDate()
     m.setDate(d.getDate() - n + 1);
-    console.log(n, m)
-    db.collection("ConDashboard").where("consumerid", "==", 123456789).get()
-        .then(function(q) {
-            q.forEach(function(doc) {
-                if (doc.exists) {
-                    console.log(doc.data())
-                    doc.ref.delete();
-                }
-            });
-        });
+
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var yesterday = admin.firestore.Timestamp.fromDate(d)
     var month = admin.firestore.Timestamp.fromDate(m)
-    let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
+    let UserRef = db.collection('Consumption').where("consumerid", "==", req.con)
     UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 storeday.push(doc.data().unit)
             });
             todayunit = storeday[1] - storeday[0]
-            db.collection('ConDashboard').add({
-                consumerid: 123456789,
-                today: todayunit
-            })
+            db.collection("ConDashboard").where("consumerid", "==", req.con).get()
+                .then(function(q) {
+                    q.forEach(function(doc) {
+                        if (doc.exists) {
+                            db.collection('ConDashboard').doc(doc.id).set({
+                                today: todayunit
+                            }, { merge: true })
+                        }
+                    });
+                });
         });
-    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).get()
+    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
-                storemonth.push(doc.data().unit)
+                // storemonth.push(doc.data().unit)
+                console.log(doc.data())
             });
-            monthunit = storemonth[storemonth.length - 1] - storemonth[0]
-            console.log(monthunit);
-            db.collection("ConDashboard").where("consumerid", "==", 123456789).get()
+            //monthunit = storemonth[storemonth.length - 1] - storemonth[0]
+            monthunit = 0;
+            db.collection("ConDashboard").where("consumerid", "==", req.con).get()
                 .then(function(q) {
                     q.forEach(function(doc) {
                         if (doc.exists) {
@@ -343,7 +344,16 @@ app.post('/api/ConsumerDashboard', function(req, res) {
                     });
                 });
         });
-    res.status(200).json({ 'status': 1, 'unit': todayunit });
+    db.collection("ConDashboard").where("consumerid", "==", req.con).get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    today = doc.data().today;
+                    month = doc.data().month;
+                }
+            });
+            res.status(200).json({ 'status': 1, 'today': today, 'month': month });
+        });
 });
 
 app.listen(process.env.PORT || 3000);
