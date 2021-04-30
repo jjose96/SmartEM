@@ -39,7 +39,7 @@ export class ProfileComponent implements OnInit {
     headers = headers.set('Authorization', 'Bearer ' + token);
     this.http.post<any>(environment.url + '/api/ProfileUpdate'
       // tslint:disable-next-line:max-line-length
-      , {firstname: data.firstname, lastname: data.lastname, email: data.email, phone: data.phone, address: data.address, city: data.city, pincode: data.pincode}
+      , {firstname: data.firstname, lastname: data.lastname, phone: data.phone, address: data.address, city: data.city, pincode: data.pincode}
       , {headers})
       .subscribe(result => {
         status = result.status;

@@ -53,6 +53,7 @@ function conAuth(req, res, next) {
     jwt.verify(token, consumerTokenSecret, (err, user) => {
         if (err) return res.status(200).json({ "status": "0" })
         req.con = user.consumerId;
+        req.board = user.board;
         next()
     })
 }
@@ -158,7 +159,7 @@ app.post('/api/login', function(req, res) {
         .then(function(q) {
             q.forEach(function(doc) {
                 if (doc.exists) {
-                    const accessToken = jwt.sign({ consumerId: doc.data().username }, consumerTokenSecret);
+                    const accessToken = jwt.sign({ consumerId: doc.data().username, board: doc.data().board }, consumerTokenSecret);
                     res.status(200).json({ "status": "1", "auth": accessToken })
                     status = 1
                 }
@@ -217,7 +218,6 @@ app.post('/api/ProfileUpdate', conAuth, function(req, res) {
     var lastname = req.body.lastname;
     var address = req.body.address
     var city = req.body.city
-    var email = req.body.email;
     var phone = req.body.phone;
     var pincode = req.body.pincode;
     UserRef.get()
@@ -229,7 +229,6 @@ app.post('/api/ProfileUpdate', conAuth, function(req, res) {
                     address: address,
                     city: city,
                     pincode: pincode,
-                    email: email,
                     phone: phone,
                 });
             });
@@ -253,6 +252,30 @@ app.post('/api/PasswordChange', conAuth, function(req, res) {
 
 });
 
+app.post('/api/SetLimit', conAuth, function(req, res) {
+    var unit = req.body.unit;
+    let status = 0
+    let UserRef = db.collection('Limit').doc(req.con);
+    UserRef.set({
+        board: req.board,
+        consumerid: req.con,
+        limit: unit
+    }, { merge: true });
+    res.status(200).json({ 'status': 1 });
+});
+app.post('/api/GetLimit', conAuth, function(req, res) {
+    var unit;
+    let status = 0;
+    let UserRef = db.collection('Limit').doc(req.con);
+    UserRef.get().then((doc) => {
+        if (doc.exists) {
+            unit = doc.data().limit;
+            res.status(200).json({ 'status': 1, 'unit': unit });
+        } else {
+            res.status(200).json({ 'status': 0 });
+        }
+    });
+});
 app.post('/api/ReadingStatus', function(req, res) {
     var board = req.body.board;
     var consumerid = req.body.consumerid;
@@ -273,20 +296,11 @@ app.post('/api/ConsumerDashboard', function(req, res) {
     yesterday.setDate(yesterday.getDate() - 1)
     var yunit = 0;
     tunit = 0;
-    console.log(today.toISOString().split('.')[0])
     let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
-    UserRef.where("date", "==", yesterday.toISOString().split('.')[0]).get()
+    UserRef.where("date", ">=", yesterday.toISOString().split('.')[0]).where("date", "<=", today.toISOString().split('.')[0]).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
-                yunit = doc.data().unit
-                console.log(yunit)
-            });
-        });
-    UserRef.where("date", "==", today.toISOString().split('.')[0]).get()
-        .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                console.log(doc.data().unit - yunit)
-                tunit = doc.data().unit - yunit;
+                console.log(doc.data())
             });
         });
     res.status(200).json({ 'status': 1, 'unit': tunit });

@@ -23,6 +23,8 @@ import { ProfileComponent } from './Consumers/profile/profile.component';
 import { BillsComponent } from './Board/bills/bills.component';
 import { PasswordchangeComponent } from './Consumers/passwordchange/passwordchange.component';
 import { CompareDirective } from './Consumers/passwordchange/passwordchange.directive';
+import { LimitwarningComponent } from './Consumers/limitwarning/limitwarning.component';
+import { PushNotificationsModule } from 'ng-push';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
@@ -45,10 +47,8 @@ const routes: Routes = [
     {path: 'usages', component: UsagesComponent},
     {path: 'bills', component: BillComponent},
     {path: 'profile', component: ProfileComponent},
-    {path: 'passwordchange', component: PasswordchangeComponent}
-
-
-
+    {path: 'passwordchange', component: PasswordchangeComponent},
+    {path: 'limit', component: LimitwarningComponent}
   ]}
 ];
 @NgModule({
@@ -62,6 +62,7 @@ const routes: Routes = [
     DashboardComponent,
     MergeComponent,
     ConsumerallComponent,
+    ConsumerpendingComponent,
     NewconsumerComponent,
     SidebardashComponent,
     UserpanelComponent,
@@ -71,11 +72,13 @@ const routes: Routes = [
     ProfileComponent,
     BillsComponent,
     PasswordchangeComponent,
-    CompareDirective  ],
+    CompareDirective,
+    LimitwarningComponent,  ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
+    PushNotificationsModule,
     RouterModule.forRoot(routes)
   ],
   exports: [RouterModule, CompareDirective  ],

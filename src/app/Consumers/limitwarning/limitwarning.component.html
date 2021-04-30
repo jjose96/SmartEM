@@ -1,0 +1,47 @@
+<div class="main-content arran">
+
+    <!-- Top navbar -->
+    <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+    </nav>
+    <!-- Header -->
+    <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 400px;  background-size: cover; background-position: center top;">
+        <!-- Mask -->
+        <span class="mask bg-gradient-default opacity-8"></span>
+        <!-- Header container -->
+        <div class="container-fluid d-flex">
+            <div class="row">
+                <div class="col">
+                    <h3 class="display-2 text-white">Hello {{firstname}}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Page content -->
+    <div class="container-fluid mt--7">
+        <div class="row">
+            <div class="col-xl-10 order-xl-1">
+                <div class="card bg-secondary shadow">
+                    <div class="card-body">
+                        <form method="post" (ngSubmit)="onSubmit(frm.value)" #frm="ngForm">
+                            <h6 class="heading-small text-muted mb-4">Set Usage limit</h6>
+                            <div class="pl-lg-4">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group focused">
+                                            <label class="form-control-label" for="input-username">Daily usage limit</label>
+                                            <input type="number" id="input-username" class="form-control form-control-alternative" name="unit" required ngModel="{{limitunit}}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="text-info">You will get a notification if the daily usage limit exceeds</span>
+                            <div class="d-flex justify-content-center">
+                                <input type="submit" [disabled]="!frm.valid" class="btn btn-success" value="Set Usage Limit">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
