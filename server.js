@@ -281,8 +281,40 @@ app.post('/api/ReadingStatus', function(req, res) {
     var board = req.body.board;
     var consumerid = req.body.consumerid;
     var unit = parseInt(req.body.unit);
+    var state = 0;
     var date = new Date(req.body.date);
-    db.collection("Consumption").add({
+    var todate = new Date(req.body.date);
+    todate.setHours(00);
+    todate.setMinutes(00);
+    let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
+    UserRef.where("date", "<=", date).where("date", ">=", todate).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                db.collection("Consumption").doc(doc.id).set({
+                    unit: unit,
+                    date: date,
+                }, { merge: true });
+                state = 1;
+            });
+            if (state == 0) {
+                db.collection("Consumption").add({
+                    board: board,
+                    consumerid: consumerid,
+                    unit: unit,
+                    date: date,
+                });
+            }
+        });
+    db.collection('TodayGraph').where("date", "<", todate).get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    doc.ref.delete();
+                }
+            });
+        });
+
+    db.collection("TodayGraph").add({
         board: board,
         consumerid: consumerid,
         unit: unit,
@@ -299,7 +331,9 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     let storemonth = []
     let todayunit;
     d.setDate(d.getDate() - 1);
+    d.setHours(00);
     n = m.getDate()
+    m.setHours(00);
     m.setDate(m.getDate() - n);
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var yesterday = admin.firestore.Timestamp.fromDate(d)
@@ -344,8 +378,8 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
         .then(function(q) {
             q.forEach(function(doc) {
                 if (doc.exists) {
-                    today = doc.data().today;
-                    month = doc.data().month;
+                    today = doc.data().today.toFixed(2);
+                    month = doc.data().month.toFixed(2);
                 }
             });
             res.status(200).json({ 'status': 1, 'today': today, 'month': month });
@@ -355,6 +389,7 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
 app.post('/api/Last7Days', conAuth, function(req, res) {
     var d = new Date();
     d.setDate(d.getDate() - 8);
+    d.setHours(00);
     let Weekdata = []
     let store = []
     let finals = []
@@ -375,7 +410,7 @@ app.post('/api/Last7Days', conAuth, function(req, res) {
         });
         while (n < 8) {
             c = store[n + 1] - store[n]
-            p = Weekdata[n + 1]['tunit'] = c;
+            p = Weekdata[n + 1]['tunit'] = c.toFixed(2);
             n = n + 1
             if (n > 8) {
                 break;

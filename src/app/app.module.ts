@@ -25,6 +25,7 @@ import { PasswordchangeComponent } from './Consumers/passwordchange/passwordchan
 import { CompareDirective } from './Consumers/passwordchange/passwordchange.directive';
 import { LimitwarningComponent } from './Consumers/limitwarning/limitwarning.component';
 import { PushNotificationsModule } from 'ng-push';
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
@@ -79,6 +80,7 @@ const routes: Routes = [
     FormsModule,
     HttpClientModule,
     PushNotificationsModule,
+    NgApexchartsModule,
     RouterModule.forRoot(routes)
   ],
   exports: [RouterModule, CompareDirective  ],
