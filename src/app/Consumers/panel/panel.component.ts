@@ -10,6 +10,7 @@ import { environment } from '../../../environments/environment';
 export class PanelComponent implements OnInit {
 today;
 month;
+WeekList: Array<any>;
   constructor(private http: HttpClient) {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
@@ -18,9 +19,10 @@ month;
               this.today = result.today;
               this.month = result.month;
              });
+    this.http.post<any>(environment.url + '/api/Last7Days', {}, {headers}).subscribe(result => {
+              this.WeekList = result.week;
+               });
    }
-
   ngOnInit(): void {
   }
-
 }

@@ -137,13 +137,11 @@ app.post('/api/ConsumerUserInfo', authenticateToken, function(req, res) {
 
 app.post('/api/RemoveConsumerUserInfo', authenticateToken, function(req, res) {
     var consId = req.body.consumedId;
-    console.log(consId)
     let UserRef = db.collection('Users').where("board", "==", req.user).where("username", "==", consId);
     UserRef.get()
         .then(function(q) {
             q.forEach(function(doc) {
                 if (doc.exists) {
-                    console.log(doc.data())
                     doc.ref.delete();
                 }
             });
@@ -301,9 +299,8 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     let storemonth = []
     let todayunit;
     d.setDate(d.getDate() - 1);
-    n = d.getDate()
-    m.setDate(d.getDate() - n + 1);
-
+    n = m.getDate()
+    m.setDate(m.getDate() - n);
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var yesterday = admin.firestore.Timestamp.fromDate(d)
     var month = admin.firestore.Timestamp.fromDate(m)
@@ -324,26 +321,25 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
                         }
                     });
                 });
-        });
-    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
-        .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                // storemonth.push(doc.data().unit)
-                console.log(doc.data())
-            });
-            //monthunit = storemonth[storemonth.length - 1] - storemonth[0]
-            monthunit = 0;
-            db.collection("ConDashboard").where("consumerid", "==", req.con).get()
-                .then(function(q) {
-                    q.forEach(function(doc) {
-                        if (doc.exists) {
-                            db.collection('ConDashboard').doc(doc.id).set({
-                                month: monthunit
-                            }, { merge: true })
-                        }
+            UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        lastm = doc.data().unit
                     });
+                    monthunit = storeday[1] - lastm;
+                    db.collection("ConDashboard").where("consumerid", "==", req.con).get()
+                        .then(function(q) {
+                            q.forEach(function(doc) {
+                                if (doc.exists) {
+                                    db.collection('ConDashboard').doc(doc.id).set({
+                                        month: monthunit
+                                    }, { merge: true })
+                                }
+                            });
+                        });
                 });
         });
+
     db.collection("ConDashboard").where("consumerid", "==", req.con).get()
         .then(function(q) {
             q.forEach(function(doc) {
@@ -356,4 +352,39 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
         });
 });
 
+app.post('/api/Last7Days', conAuth, function(req, res) {
+    var d = new Date();
+    d.setDate(d.getDate() - 8);
+    let Weekdata = []
+    let store = []
+    let finals = []
+    let n = 0;
+    const todayAsTimestamp = admin.firestore.Timestamp.now()
+    var week = admin.firestore.Timestamp.fromDate(d)
+    let UserRef = db.collection('Consumption').where("consumerid", "==", req.con).where("date", "<=", todayAsTimestamp).where("date", ">=", week).orderBy("date")
+    UserRef.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            localdate = doc.data().date.toDate().toLocaleString('en-GB', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            })
+            store.push(doc.data().unit)
+            let useme = { 'unit': doc.data().unit, 'date': localdate }
+            Weekdata.push(useme)
+        });
+        while (n < 8) {
+            c = store[n + 1] - store[n]
+            p = Weekdata[n + 1]['tunit'] = c;
+            n = n + 1
+            if (n > 8) {
+                break;
+            }
+        }
+        Weekdata.splice(0, 1);
+
+        res.status(200).json({ 'status': 1, 'week': Weekdata });
+
+    });
+});
 app.listen(process.env.PORT || 3000);
