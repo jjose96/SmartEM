@@ -336,9 +336,11 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     let todayunit;
     d.setDate(d.getDate() - 1);
     d.setHours(00);
+    var d = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
     n = m.getDate()
     m.setHours(00);
     m.setDate(m.getDate() - n);
+    var m = new Date(m.getTime() - m.getTimezoneOffset() * 60000)
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var yesterday = admin.firestore.Timestamp.fromDate(d)
     var month = admin.firestore.Timestamp.fromDate(m)
@@ -393,12 +395,11 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
 });
 
 app.post('/api/Last7Days', conAuth, function(req, res) {
-    let d = new Date;
-    console.log(d)
+    var d = new Date();
+    var d = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
     d.setHours(00);
     d.setMinutes(00);
-    console.log(d)
-        // d.setDate(d.getDate() - 8);
+    d.setDate(d.getDate() - 8);
     let Weekdata = []
     let store = []
     let finals = []
@@ -408,33 +409,40 @@ app.post('/api/Last7Days', conAuth, function(req, res) {
     let UserRef = db.collection('Consumption').where("consumerid", "==", req.con).where("date", "<=", todayAsTimestamp).where("date", ">=", week).orderBy("date")
     UserRef.get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-            localdate = doc.data().date.toDate.toLocaleString([], {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                })
-                // console.log(doc.data(), localdate)
+            localdate = doc.data().date.toDate().toDateString()
             store.push(doc.data().unit);
             let useme = { 'unit': doc.data().unit, 'date': localdate }
             Weekdata.push(useme)
         });
-        while (n < 8) {
-            c = store[n + 1] - store[n]
-            p = Weekdata[n + 1]['tunit'] = c.toFixed(2);
-            n = n + 1
-            if (n > 8) {
-                break;
+        try {
+            while (n < 8) {
+                c = store[n + 1] - store[n]
+                p = Weekdata[n + 1]['tunit'] = c.toFixed(2);
+                n = n + 1
+                if (n > 8) {
+                    break;
+                }
             }
-        }
+        } catch (err) {}
         Weekdata.splice(0, 1);
 
         res.status(200).json({ 'status': 1, 'week': Weekdata });
 
     });
 });
-app.post('/api/Date', function(req, res) {
-    const v = new Date()
-    console.log(v);
-    res.status(200).json({ 'status': 1, 'date': v })
+
+app.post("/api/DailyChart", conAuth, function(req, res) {
+    let UserRef = db.collection('Users').where("username", "==", req.con);
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    res.status(200).json({ 'status': 1, 'firstname': doc.data().firstname, 'lastname': doc.data().lastname });
+                } else {
+                    res.status(200).json({ 'status': 0, name: 'invalid user' });
+                }
+            });
+        });
 });
+
 app.listen(process.env.PORT || 3000);
