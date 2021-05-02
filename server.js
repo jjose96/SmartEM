@@ -280,20 +280,23 @@ app.post('/api/GetLimit', conAuth, function(req, res) {
 app.post('/api/ReadingStatus', function(req, res) {
     var board = req.body.board;
     var consumerid = req.body.consumerid;
-    var unit = parseInt(req.body.unit);
+    var unit = parseFloat(req.body.unit);
     var state = 0;
-    var date = new Date(req.body.date);
-    var todate = new Date(req.body.date);
+    var date = Date(req.body.date);
+    var todate = Date(req.body.date);
     todate.setHours(00);
     todate.setMinutes(00);
+    todate.setSeconds(00);
     let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
     UserRef.where("date", "<=", date).where("date", ">=", todate).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
-                db.collection("Consumption").doc(doc.id).set({
-                    unit: unit,
-                    date: date,
-                }, { merge: true });
+                if (doc.exists) {
+                    db.collection("Consumption").doc(doc.id).set({
+                        unit: unit,
+                        date: date,
+                    }, { merge: true });
+                }
                 state = 1;
             });
             if (state == 0) {
@@ -322,11 +325,12 @@ app.post('/api/ReadingStatus', function(req, res) {
     });
     res.status(200).json({ 'status': 1 });
 });
+
 app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     var yunit = 0;
     tunit = 0;
-    var d = new Date();
-    var m = new Date();
+    var d = new Date;
+    var m = new Date;
     let storeday = []
     let storemonth = []
     let todayunit;
@@ -355,23 +359,25 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
                         }
                     });
                 });
-            UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        lastm = doc.data().unit
+        });
+    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                lastm = doc.data().unit
+            });
+            monthunit = storeday[1] - lastm;
+            db.collection("ConDashboard").where("consumerid", "==", req.con).get()
+                .then(function(q) {
+                    q.forEach(function(doc) {
+                        if (doc.exists) {
+                            db.collection('ConDashboard').doc(doc.id).set({
+                                month: monthunit
+                            }, { merge: true })
+                        }
                     });
-                    monthunit = storeday[1] - lastm;
-                    db.collection("ConDashboard").where("consumerid", "==", req.con).get()
-                        .then(function(q) {
-                            q.forEach(function(doc) {
-                                if (doc.exists) {
-                                    db.collection('ConDashboard').doc(doc.id).set({
-                                        month: monthunit
-                                    }, { merge: true })
-                                }
-                            });
-                        });
                 });
+
+
         });
 
     db.collection("ConDashboard").where("consumerid", "==", req.con).get()
@@ -387,9 +393,12 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
 });
 
 app.post('/api/Last7Days', conAuth, function(req, res) {
-    var d = new Date();
-    d.setDate(d.getDate() - 8);
+    let d = new Date;
+    console.log(d)
     d.setHours(00);
+    d.setMinutes(00);
+    console.log(d)
+        // d.setDate(d.getDate() - 8);
     let Weekdata = []
     let store = []
     let finals = []
@@ -399,12 +408,13 @@ app.post('/api/Last7Days', conAuth, function(req, res) {
     let UserRef = db.collection('Consumption').where("consumerid", "==", req.con).where("date", "<=", todayAsTimestamp).where("date", ">=", week).orderBy("date")
     UserRef.get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-            localdate = doc.data().date.toDate().toLocaleString('en-GB', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            })
-            store.push(doc.data().unit)
+            localdate = doc.data().date.toDate.toLocaleString([], {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                })
+                // console.log(doc.data(), localdate)
+            store.push(doc.data().unit);
             let useme = { 'unit': doc.data().unit, 'date': localdate }
             Weekdata.push(useme)
         });
@@ -421,5 +431,10 @@ app.post('/api/Last7Days', conAuth, function(req, res) {
         res.status(200).json({ 'status': 1, 'week': Weekdata });
 
     });
+});
+app.post('/api/Date', function(req, res) {
+    const v = new Date()
+    console.log(v);
+    res.status(200).json({ 'status': 1 })
 });
 app.listen(process.env.PORT || 3000);

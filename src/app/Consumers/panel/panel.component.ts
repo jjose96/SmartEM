@@ -11,6 +11,7 @@ export class PanelComponent implements OnInit {
 today;
 month;
 WeekList: Array<any>;
+reversedList: Array<any>;
   constructor(private http: HttpClient) {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
@@ -21,6 +22,7 @@ WeekList: Array<any>;
              });
     this.http.post<any>(environment.url + '/api/Last7Days', {}, {headers}).subscribe(result => {
               this.WeekList = result.week;
+              this.reversedList = this.WeekList.slice().reverse();
                });
    }
   ngOnInit(): void {
