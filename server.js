@@ -432,16 +432,15 @@ app.post('/api/Last7Days', conAuth, function(req, res) {
 });
 
 app.post("/api/DailyChart", conAuth, function(req, res) {
-    let UserRef = db.collection('Users').where("username", "==", req.con);
-    UserRef.get()
+    var today = admin.firestore.Timestamp.now();
+    var store = []
+    let UserRef = db.collection('TodayGraph').where("consumerid", "==", req.con)
+    UserRef.where("date", "<=", today).get()
         .then(function(q) {
             q.forEach(function(doc) {
-                if (doc.exists) {
-                    res.status(200).json({ 'status': 1, 'firstname': doc.data().firstname, 'lastname': doc.data().lastname });
-                } else {
-                    res.status(200).json({ 'status': 0, name: 'invalid user' });
-                }
+                store.push(doc.data().unit)
             });
+            res.status(200).json({ 'status': 1, 'units': store })
         });
 });
 

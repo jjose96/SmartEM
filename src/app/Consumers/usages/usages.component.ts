@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -27,15 +28,23 @@ export type ChartOptions = {
   styleUrls: ['./usages.component.css']
 })
 export class UsagesComponent implements OnInit {
+  today;
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
 
-  constructor() {
+  constructor(private http: HttpClient) {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+    headers = headers.set('Authorization', 'Bearer ' + token);
+    this.http.post<any>(environment.url + '/api/DailyChart', {}, { headers }).subscribe(result => {
+              this.today = result.units;
+              console.log(result.units);
+             });
     this.chartOptions = {
       series: [
         {
           name: 'Energy Consumption',
-          data: [10, 41, 35, 51, 49, 62, 69, 91, 148]
+          data: this.today
         }
       ],
       chart: {
