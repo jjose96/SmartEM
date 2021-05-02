@@ -435,6 +435,6 @@ app.post('/api/Last7Days', conAuth, function(req, res) {
 app.post('/api/Date', function(req, res) {
     const v = new Date()
     console.log(v);
-    res.status(200).json({ 'status': 1 })
+    res.status(200).json({ 'status': 1, 'date': v })
 });
 app.listen(process.env.PORT || 3000);
