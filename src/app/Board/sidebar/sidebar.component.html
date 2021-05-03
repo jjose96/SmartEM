@@ -1,89 +1,87 @@
-  <div class="page-wrapper chiller-theme toggled">
+<div class="page-wrapper chiller-theme toggled">
     <a id="show-sidebar" class="btn btn-sm btn-dark">
-      <i class="fas fa-bars"></i>
+        <i class="fas fa-bars"></i>
     </a>
     <nav id="sidebar" class="sidebar-wrapper">
-      <div class="sidebar-content">
-        <div class="sidebar-brand">
-          <a href="#"></a>
-          <div id="close-sidebar">
-            <i class="fas fa-times"></i>
-          </div>
-        </div>
-        <div class="sidebar-header">
-          <div class="user-pic">
-            <img class="img-responsive img-rounded" src="https://raw.githubusercontent.com/azouaoui-med/pro-sidebar-template/gh-pages/src/img/user.jpg" alt="User picture">
-          </div>
-          <div class="user-info">
-            <span class="user-name">
+        <div class="sidebar-content">
+            <div class="sidebar-brand">
+                <a href="#"></a>
+                <div id="close-sidebar">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="sidebar-header">
+                <div class="user-pic">
+                    <img class="img-responsive img-rounded" src="https://raw.githubusercontent.com/azouaoui-med/pro-sidebar-template/gh-pages/src/img/user.jpg" alt="User picture">
+                </div>
+                <div class="user-info">
+                    <span class="user-name">
               <strong>
 
               </strong>
             </span>
-            <span class="user-role"><strong>{{ user }} Section</strong></span>
-            <span class="user-status">
+                    <span class="user-role"><strong>{{ user }} Section</strong></span>
+                    <span class="user-status">
               <i class="fa fa-circle"></i>
               <span>Online</span>
-            </span>
-          </div>
-        </div>
-        <!-- sidebar-header  -->
-        <!-- sidebar-search  -->
-        <div class="sidebar-menu">
-          <ul>
-            <li class="header-menu">
-              <span>General</span>
-            </li>
-            <li class="sidebar-dropdown">
-              <a routerLink="/dashboard" >
-                <i class="fa fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-              </a>
-            <li class="sidebar-dropdown">
-              <a>
-                <i class="fa fa-shopping-cart"></i>
-                <span>Consumers</span>
-              </a>
-              <div class="sidebar-submenu">
+                    </span>
+                </div>
+            </div>
+            <!-- sidebar-header  -->
+            <!-- sidebar-search  -->
+            <div class="sidebar-menu">
                 <ul>
-                  <li>
-                    <a routerLink="consumerall">All Consumers
+                    <li class="header-menu">
+                        <span>General</span>
+                    </li>
+                    <li class="sidebar-dropdown">
+                        <a routerLink="/dashboard">
+                            <i class="fa fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <li class="sidebar-dropdown">
+                            <a>
+                                <i class="fa fa-shopping-cart"></i>
+                                <span>Consumers</span>
+                            </a>
+                            <div class="sidebar-submenu">
+                                <ul>
+                                    <li>
+                                        <a routerLink="consumerall">All Consumers
 
                     </a>
-                  </li>
-                  <li>
-                    <a routerLink="pending">Pending requests</a>
-                  </li>
+                                    </li>
+                                    <li>
+                                        <a routerLink="pending">Pending requests</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="sidebar-dropdown">
+                            <a routerLink="bills">
+                                <i class="far fa-gem"></i>
+                                <span>Bills</span>
+                            </a>
+                            <div class="sidebar-submenu">
+                            </div>
+                        </li>
+                        <li class="sidebar-dropdown">
+                            <a href="#">
+                                <i class="fa fa-chart-line"></i>
+                                <span>Profile</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-dropdown">
+                            <a (click)='OnLogout()'>
+                                <i class="fa fa-globe"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
                 </ul>
-              </div>
-            </li>
-            <li class="sidebar-dropdown">
-              <a href="#">
-                <i class="far fa-gem"></i>
-                <span>Bills</span>
-              </a>
-              <div class="sidebar-submenu">
-              </div>
-            </li>
-            <li class="sidebar-dropdown">
-              <a href="#">
-                <i class="fa fa-chart-line"></i>
-                <span>Profile</span>
-              </a>
-            </li>
-            <li class="sidebar-dropdown">
-              <a (click)='OnLogout()'>
-                <i class="fa fa-globe"></i>
-                <span>Logout</span>
-              </a>
-            </li>
-          </ul>
+            </div>
+            <!-- sidebar-menu  -->
         </div>
-        <!-- sidebar-menu  -->
-      </div>
-      <!-- sidebar-content  -->
+        <!-- sidebar-content  -->
     </nav>
 
-  </div>
-
-
+</div>

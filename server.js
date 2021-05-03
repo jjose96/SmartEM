@@ -502,7 +502,7 @@ app.post("/api/WeeklyChart", conAuth, function(req, res) {
     });
 });
 
-app.post("/api/MonthlyChart", function(req, res) {
+app.post("/api/MonthlyChart", conAuth, function(req, res) {
     var d = new Date();
     var d = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
     d.setHours(00);
@@ -514,7 +514,7 @@ app.post("/api/MonthlyChart", function(req, res) {
     let n = 0;
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var week = admin.firestore.Timestamp.fromDate(d)
-    let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789").where("date", "<=", todayAsTimestamp).where("date", ">=", week).orderBy("date")
+    let UserRef = db.collection('Consumption').where("consumerid", "==", req.con).where("date", "<=", todayAsTimestamp).where("date", ">=", week).orderBy("date")
     UserRef.get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             localdate = doc.data().date.toDate().toDateString()
@@ -545,4 +545,32 @@ app.post('/api/Date', function(req, res) {
     var d = new Date(v.getTime() - v.getTimezoneOffset() * 60000)
     res.status(200).json({ 'status': 1, 'date': d })
 });
+
+// app.post('/api/BillSlab', function(req, res) {
+//     var data = req.body.data;
+//     let UserRef = db.collection('Price').where("board", "==", "kalanjoor")
+//     for(int i=0;i<data.length;i++){
+//       UserRef..where("date", ">=", todate).get()
+//           .then((querySnapshot) => {
+//               querySnapshot.forEach((doc) => {
+//                   if (doc.exists) {
+//                       db.collection("Consumption").doc(doc.id).set({
+//                           unit: unit,
+//                           date: date,
+//                       }, { merge: true });
+//                   }
+//                   state = 1;
+//               });
+//               if (state == 0) {
+//                   db.collection("Consumption").add({
+//                       board: board,
+//                       consumerid: consumerid,
+//                       unit: unit,
+//                       date: date,
+//                   });
+//               }
+//           });
+//     }
+//     res.status(200).json({ status: '1' })
+// });
 app.listen(process.env.PORT || 3000);
