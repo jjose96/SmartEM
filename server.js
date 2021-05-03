@@ -434,16 +434,109 @@ app.post('/api/Last7Days', conAuth, function(req, res) {
 app.post("/api/DailyChart", conAuth, function(req, res) {
     var today = admin.firestore.Timestamp.now();
     var store = []
+    var record = []
+    n = 0
     let UserRef = db.collection('TodayGraph').where("consumerid", "==", req.con)
     UserRef.where("date", "<=", today).get()
         .then(function(q) {
             q.forEach(function(doc) {
                 localdate = doc.data().date.toDate().toLocaleTimeString();
-                let use = { x: localdate, y: doc.data().unit }
-                store.push(use)
+                let use = { x: localdate }
+                store.push(doc.data().unit);
+                record.push(use);
             });
-            res.status(200).json({ 'status': 1, 'units': store })
+            while (n < store.length) {
+                if (typeof store[n + 1] === "undefined") {
+                    store[n + 1] = store[n]
+                }
+                if (typeof record[n + 1] === "undefined") {
+                    break;
+                }
+
+                c = store[n + 1] - store[n]
+                p = record[n + 1]['y'] = c.toFixed(2);
+                n = n + 1
+                if (n > store.length) {
+                    break;
+                }
+            }
+            record.splice(0, 1);
+            res.status(200).json({ 'status': 1, 'units': record })
         });
+});
+
+app.post("/api/WeeklyChart", conAuth, function(req, res) {
+    var d = new Date();
+    var d = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+    d.setHours(00);
+    d.setMinutes(00);
+    d.setDate(d.getDate() - 8);
+    let Weekdata = []
+    let store = []
+    let finals = []
+    let n = 0;
+    const todayAsTimestamp = admin.firestore.Timestamp.now()
+    var week = admin.firestore.Timestamp.fromDate(d)
+    let UserRef = db.collection('Consumption').where("consumerid", "==", req.con).where("date", "<=", todayAsTimestamp).where("date", ">=", week).orderBy("date")
+    UserRef.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            localdate = doc.data().date.toDate().toDateString()
+            store.push(doc.data().unit);
+            let useme = { x: localdate }
+            Weekdata.push(useme)
+        });
+        try {
+            while (n < 8) {
+                c = store[n + 1] - store[n]
+                p = Weekdata[n + 1]['y'] = c.toFixed(2);
+                n = n + 1
+                if (n > 8) {
+                    break;
+                }
+            }
+        } catch (err) {}
+        Weekdata.splice(0, 1);
+
+        res.status(200).json({ 'status': 1, 'week': Weekdata });
+
+    });
+});
+
+app.post("/api/MonthlyChart", function(req, res) {
+    var d = new Date();
+    var d = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+    d.setHours(00);
+    d.setMinutes(00);
+    d.setDate(d.getDate() - 32);
+    let Weekdata = []
+    let store = []
+    let finals = []
+    let n = 0;
+    const todayAsTimestamp = admin.firestore.Timestamp.now()
+    var week = admin.firestore.Timestamp.fromDate(d)
+    let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789").where("date", "<=", todayAsTimestamp).where("date", ">=", week).orderBy("date")
+    UserRef.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            localdate = doc.data().date.toDate().toDateString()
+            store.push(doc.data().unit);
+            let useme = { x: localdate }
+            Weekdata.push(useme)
+        });
+        try {
+            while (n < 32) {
+                c = store[n + 1] - store[n]
+                p = Weekdata[n + 1]['y'] = c.toFixed(2);
+                n = n + 1
+                if (n > 32) {
+                    break;
+                }
+            }
+        } catch (err) {}
+        Weekdata.splice(0, 1);
+
+        res.status(200).json({ 'status': 1, 'month': Weekdata });
+
+    });
 });
 app.post('/api/Date', function(req, res) {
     const v = new Date()

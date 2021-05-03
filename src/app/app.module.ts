@@ -26,6 +26,9 @@ import { CompareDirective } from './Consumers/passwordchange/passwordchange.dire
 import { LimitwarningComponent } from './Consumers/limitwarning/limitwarning.component';
 import { PushNotificationsModule } from 'ng-push';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { DailychartComponent } from './Consumers/dailychart/dailychart.component';
+import { WeeklychartComponent } from './Consumers/weeklychart/weeklychart.component';
+import { MonthlychartComponent } from './Consumers/monthlychart/monthlychart.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
@@ -74,7 +77,10 @@ const routes: Routes = [
     BillsComponent,
     PasswordchangeComponent,
     CompareDirective,
-    LimitwarningComponent,  ],
+    LimitwarningComponent,
+    DailychartComponent,
+    WeeklychartComponent,
+    MonthlychartComponent,  ],
   imports: [
     BrowserModule,
     FormsModule,
