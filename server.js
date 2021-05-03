@@ -282,8 +282,8 @@ app.post('/api/ReadingStatus', function(req, res) {
     var consumerid = req.body.consumerid;
     var unit = parseFloat(req.body.unit);
     var state = 0;
-    var date = Date(req.body.date);
-    var todate = Date(req.body.date);
+    var date = new Date(req.body.date);
+    var todate = new Date(req.body.date);
     todate.setHours(00);
     todate.setMinutes(00);
     todate.setSeconds(00);
@@ -438,10 +438,18 @@ app.post("/api/DailyChart", conAuth, function(req, res) {
     UserRef.where("date", "<=", today).get()
         .then(function(q) {
             q.forEach(function(doc) {
-                store.push(doc.data().unit)
+                localdate = doc.data().date.toDate().toLocaleTimeString();
+                let use = { x: localdate, y: doc.data().unit }
+                store.push(use)
             });
             res.status(200).json({ 'status': 1, 'units': store })
         });
 });
-
+app.post('/api/Date', function(req, res) {
+    const v = new Date()
+    v.setHours(0)
+    console.log(v);
+    var d = new Date(v.getTime() - v.getTimezoneOffset() * 60000)
+    res.status(200).json({ 'status': 1, 'date': d })
+});
 app.listen(process.env.PORT || 3000);

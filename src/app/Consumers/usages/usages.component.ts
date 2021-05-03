@@ -28,7 +28,7 @@ export type ChartOptions = {
   styleUrls: ['./usages.component.css']
 })
 export class UsagesComponent implements OnInit {
-  today;
+  today = [];
   @ViewChild('chart') chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
 
@@ -37,9 +37,10 @@ export class UsagesComponent implements OnInit {
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', 'Bearer ' + token);
     this.http.post<any>(environment.url + '/api/DailyChart', {}, { headers }).subscribe(result => {
-              this.today = result.units;
+              this.today.push(result.units);
               console.log(result.units);
-             });
+                        });
+
     this.chartOptions = {
       series: [
         {
@@ -100,7 +101,9 @@ export class UsagesComponent implements OnInit {
       }
     };
   }
-
+  async delay(ms: number) {
+    await new Promise<void>(resolve => setTimeout(() => resolve(), ms)).then(() => console.log('fired'));
+}
   ngOnInit(): void {
   }
 
