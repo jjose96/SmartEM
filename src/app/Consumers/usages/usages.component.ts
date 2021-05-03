@@ -38,9 +38,8 @@ export class UsagesComponent implements OnInit {
     headers = headers.set('Authorization', 'Bearer ' + token);
     this.http.post<any>(environment.url + '/api/DailyChart', {}, { headers }).subscribe(result => {
               this.today.push(result.units);
-              console.log(result.units);
                         });
-
+    console.log(this.today);
     this.chartOptions = {
       series: [
         {

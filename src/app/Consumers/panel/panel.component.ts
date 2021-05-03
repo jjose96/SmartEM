@@ -25,6 +25,9 @@ reversedList: Array<any>;
               this.reversedList = this.WeekList.slice().reverse();
                });
    }
+   reload(){
+    location.reload();
+   }
   ngOnInit(): void {
   }
 }
