@@ -582,7 +582,7 @@ app.post('/api/MonthlyCharge', conAuth, function(req, res) {
             querySnapshot.forEach((doc) => {
                 month = doc.data().month
             });
-            let PRef = db.collection("Price").where("from", "<", month).get()
+            let PRef = db.collection("Price").where("from", "<=", month).get()
                 .then((querySnapshot) => {
                     querySnapshot.forEach((doc) => {
                         price = doc.data().price;
