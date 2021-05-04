@@ -287,14 +287,16 @@ app.post('/api/ReadingStatus', function(req, res) {
     todate.setHours(00);
     todate.setMinutes(00);
     todate.setSeconds(00);
+    const todayAsTimestamp = admin.firestore.Timestamp.fromDate(date)
+    var yesterday = admin.firestore.Timestamp.fromDate(todate)
     let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
-    UserRef.where("date", "<=", date).where("date", ">=", todate).get()
+    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 if (doc.exists) {
                     db.collection("Consumption").doc(doc.id).set({
                         unit: unit,
-                        date: date,
+                        date: todayAsTimestamp,
                     }, { merge: true });
                 }
                 state = 1;
@@ -304,11 +306,11 @@ app.post('/api/ReadingStatus', function(req, res) {
                     board: board,
                     consumerid: consumerid,
                     unit: unit,
-                    date: date,
+                    date: todayAsTimestamp,
                 });
             }
         });
-    db.collection('TodayGraph').where("date", "<", todate).get()
+    db.collection('TodayGraph').where("date", "<", yesterday).get()
         .then(function(q) {
             q.forEach(function(doc) {
                 if (doc.exists) {
@@ -321,7 +323,7 @@ app.post('/api/ReadingStatus', function(req, res) {
         board: board,
         consumerid: consumerid,
         unit: unit,
-        date: date,
+        date: todayAsTimestamp,
     });
     res.status(200).json({ 'status': 1 });
 });
@@ -406,12 +408,12 @@ app.post('/api/Last7Days', conAuth, function(req, res) {
     let n = 0;
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var week = admin.firestore.Timestamp.fromDate(d)
-    let UserRef = db.collection('Consumption').where("consumerid", "==", req.con).where("date", "<=", todayAsTimestamp).where("date", ">=", week).orderBy("date")
+    let UserRef = db.collection('Consumption').where("consumerid", "==", req.con).where("date", "<=", todayAsTimestamp).where("date", ">=", week)
     UserRef.get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             localdate = doc.data().date.toDate().toDateString()
             store.push(doc.data().unit);
-            let useme = { 'unit': doc.data().unit, 'date': localdate }
+            let useme = { 'unit': doc.data().unit.toFixed(3), 'date': localdate }
             Weekdata.push(useme)
         });
         try {
@@ -573,4 +575,137 @@ app.post('/api/Date', function(req, res) {
 //     }
 //     res.status(200).json({ status: '1' })
 // });
+app.post('/api/MonthlyCharge', conAuth, function(req, res) {
+    month = 0;
+    db.collection("ConDashboard").where("consumerid", "==", req.con).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                month = doc.data().month
+            });
+            let PRef = db.collection("Price").where("from", "<", month).get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        price = doc.data().price;
+                    });
+                    fin = (month * price) + 30
+                    res.status(200).json({ 'status': 1, 'charge': fin.toFixed(2) })
+
+                });
+
+        });
+});
+
+app.post('/api/IssueBill', authenticateToken, function(req, res) {
+    var billfrom = new Date(req.body.billfrom);
+    billfrom.setHours(12)
+    var billto = new Date(req.body.billto);
+    billto.setHours(23);
+    billto.setMinutes(59);
+    billto.setSeconds(59);
+    var dDate = new Date(req.body.duedate);
+    dDate.setHours(23);
+    dDate.setMinutes(59);
+    dDate.setSeconds(59);
+    let BillRef = db.collection("Consumption")
+    var users = [];
+    var store = [];
+    var n = 0;
+    var d = new Date();
+    var now = d.getTime();
+    var billf = admin.firestore.Timestamp.fromDate(billfrom)
+    var billt = admin.firestore.Timestamp.fromDate(billto)
+    var duedate = admin.firestore.Timestamp.fromDate(dDate)
+    db.collection('Users').where("board", "==", req.user).get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                users.push(doc.data().username);
+            });
+            for (i = 0; i < users.length; i++) {
+                con = users[i];
+                BillRef.where("consumerid", "==", con).where("date", ">=", billf).where("date", "<=", billt).get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            bt = doc.data().unit
+                            use = doc.data().consumerid;
+                            store.push(bt)
+                        });
+                        if (store.length > 0) {
+                            charges = 0;
+                            charges = store[store.length - 1] - store[0];
+                            let PRef = db.collection("Price").where("from", "<", charges).get()
+                                .then((querySnapshot) => {
+                                    querySnapshot.forEach((doc) => {
+                                        price = doc.data().price;
+                                    });
+                                    fin = (charges * price) + 30
+                                    db.collection("Bills").add({
+                                        timestamp: now,
+                                        billfrom: billf,
+                                        billto: billt,
+                                        duedate: duedate,
+                                        charge: fin,
+                                        consumed: charges,
+                                        consumerid: use,
+                                        board: req.user,
+                                        state: false
+                                    })
+                                });
+                        }
+                        store = [];
+                        con = "";
+                    });
+            }
+        });
+    db.collection("BillRecord").add({
+        timestamp: now,
+        billfrom: billf,
+        billto: billt,
+        board: req.user,
+        duedate: duedate
+    })
+
+    res.status(200).json({ 'status': 1 })
+
+});
+
+app.post('/api/BillRecord', authenticateToken, function(req, res) {
+    store = [];
+    db.collection("BillRecord").where("board", "==", req.user).orderBy("duedate").get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                var billfrom = doc.data().billfrom.toDate().toDateString();
+                var billto = doc.data().billto.toDate().toDateString();
+                var duedate = doc.data().duedate.toDate().toDateString();
+                var use = { 'billfrom': billfrom, 'billto': billto, 'duedate': duedate }
+                store.push(use)
+            });
+            res.status(200).json({ 'record': store });
+
+        });
+
+});
+
+app.post('/api/UserBills', conAuth, function(req, res) {
+    store = [];
+    db.collection("Bills").where("consumerid", "==", req.con).orderBy("duedate").get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                var billfrom = doc.data().billfrom.toDate().toDateString();
+                var billto = doc.data().billto.toDate().toDateString();
+                var duedate = doc.data().duedate.toDate().toDateString();
+                var charge = doc.data().charge;
+                var state = doc.data().state;
+                var consumed = doc.data().consumed;
+                var use = { 'billfrom': billfrom, 'billto': billto, 'duedate': duedate, 'charge': charge, 'state': state, 'consumed': consumed }
+                store.push(use)
+
+            });
+            console.log(store)
+
+            res.status(200).json({ 'record': store });
+
+        });
+
+});
+
 app.listen(process.env.PORT || 3000);

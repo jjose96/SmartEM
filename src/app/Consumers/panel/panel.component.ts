@@ -10,6 +10,7 @@ import { environment } from '../../../environments/environment';
 export class PanelComponent implements OnInit {
 today;
 month;
+monthprice;
 WeekList: Array<any>;
 reversedList: Array<any>;
   constructor(private http: HttpClient) {
@@ -24,6 +25,9 @@ reversedList: Array<any>;
               this.WeekList = result.week;
               this.reversedList = this.WeekList.slice().reverse();
                });
+    this.http.post<any>(environment.url + '/api/MonthlyCharge', {}, {headers}).subscribe(result => {
+              this.monthprice = result.charge;
+           });
    }
    reload(){
     location.reload();

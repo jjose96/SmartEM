@@ -14,7 +14,8 @@ export class BillsComponent implements OnInit {
     price: '',
   }];
    todays;
-
+BillRecords: Array<any>;
+reversedList: Array<any>;
   constructor(private http: HttpClient) {
     // tslint:disable-next-line:prefer-const
     let today = new Date();
@@ -23,10 +24,37 @@ export class BillsComponent implements OnInit {
     const yyyy = today.getFullYear();
 
     this.todays = yyyy + '-' + mm + '-' + dd;
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+    headers = headers.set('Authorization', 'Bearer ' + token);
+    this.http.post<any>(environment.url + '/api/BillRecord', {}, {headers}).subscribe(result => {
+      this.BillRecords = result.record;
+      this.reversedList = this.BillRecords.slice().reverse();
+
+   });
   }
 
+  onSubmit(data){
+    const x = prompt('Enter "CONFIRM" to proceed, you will not be able to modify after the action');
+    if (x === 'CONFIRM'){
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+    headers = headers.set('Authorization', 'Bearer ' + token);
+    // tslint:disable-next-line:max-line-length
+    this.http.post<any>(environment.url + '/api/IssueBill', {
+      billfrom : data.billfrom , billto: data.billto , duedate: data.duedate
+    }, {headers})
+    .subscribe(result => {
+      if (result.status === 1){
+         location.reload();
+      }
+  });
+}
+  }
   ngOnInit(): void {
   }
+
+
   addAddress() {
     this.addresses.push({
       id: this.addresses.length + 1,

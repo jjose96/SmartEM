@@ -3,18 +3,42 @@
 
         <div class="jumbotron bg-light">
             <h2 class="panel-title">Customer Billing</h2>
-            <form>
+            <form #bdate="ngForm" (ngSubmit)="onSubmit(bdate.value)">
                 <div class="md-form input-with-post-icon">
-                    <input type="date" max="{{todays}}" class="form-control" onkeydown="return false" name="username" ngModel>
-                    <label for="suffixInside">Bill upto </label>
+                    <input type="date" max="{{todays}}" class="form-control" onkeydown="return false" name="billfrom" ngModel>
+                    <label for="suffixInside">Bill from </label>
                 </div>
                 <div class="md-form input-with-post-icon">
-                    <input type="date" id="suffixInside" class="form-control" onkeydown="return false" name="username" ngModel>
-                    <label for="suffixInside">Due date </label>
+                    <input type="date" max="{{todays}}" class="form-control" onkeydown="return false" name="billto" ngModel>
+                    <label for="suffixInside">Bill to </label>
+                </div>
+                <div class="md-form input-with-post-icon">
+                    <input type="date" id="suffixInside" class="form-control" onkeydown="return false" name="duedate" ngModel>
+                    <label for="suffixInside">Last Due date </label>
                 </div>
                 <input type="submit" class="btn btn-success" value="Submit">
             </form>
-            <!-- <hr>
+            <hr>
+            <h2>Bill Records</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">SI. No</th>
+                        <th scope="col">Bill From</th>
+                        <th scope="col">Bill Upto</th>
+                        <th scope="col">Last Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let x of reversedList; let i = index">
+                        <th scope="row">{{i+1}}</th>
+                        <td>{{x.billfrom}}</td>
+                        <td>{{x.billto}}</td>
+                        <td>{{x.duedate}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <!--
             <form #addressForm="ngForm" class="container mt-3" (ngSubmit)="logValue()">
                 <button type="button" class="btn btn-primary mb-2" (click)="addAddress()">Add Rate Slab</button>
                 <section class="container border mb-4 p-3" *ngFor="let address of addresses; let i = index;">
