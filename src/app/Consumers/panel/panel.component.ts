@@ -11,6 +11,7 @@ export class PanelComponent implements OnInit {
 today;
 month;
 monthprice;
+duedate;
 WeekList: Array<any>;
 reversedList: Array<any>;
   constructor(private http: HttpClient) {
@@ -28,6 +29,9 @@ reversedList: Array<any>;
     this.http.post<any>(environment.url + '/api/MonthlyCharge', {}, {headers}).subscribe(result => {
               this.monthprice = result.charge;
            });
+    this.http.post<any>(environment.url + '/api/LastDueDate', {}, {headers}).subscribe(result => {
+            this.duedate = result.duedate;
+         });
    }
    reload(){
     location.reload();

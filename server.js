@@ -700,12 +700,20 @@ app.post('/api/UserBills', conAuth, function(req, res) {
                 store.push(use)
 
             });
-            console.log(store)
-
             res.status(200).json({ 'record': store });
 
         });
 
+});
+app.post('/api/LastDueDate', conAuth, function(req, res) {
+    store = []
+    db.collection("Bills").where("consumerid", "==", req.con).orderBy("duedate").get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                store.push(doc.data().duedate.toDate().toDateString());
+            });
+            res.status(200).json({ status: 1, "duedate": store[store.length - 1] })
+        });
 });
 
 app.listen(process.env.PORT || 3000);
