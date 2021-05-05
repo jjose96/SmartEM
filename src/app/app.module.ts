@@ -29,6 +29,9 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { DailychartComponent } from './Consumers/dailychart/dailychart.component';
 import { WeeklychartComponent } from './Consumers/weeklychart/weeklychart.component';
 import { MonthlychartComponent } from './Consumers/monthlychart/monthlychart.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import { ConprofileComponent } from './Board/Consumers/conprofile/conprofile.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
@@ -38,7 +41,8 @@ const routes: Routes = [
   ]},
   { path: 'dashboard', component: MergeComponent, children: [
     { path: '', component: DashboardComponent },
-    { path: 'consumerall', component: ConsumerallComponent, children: [
+    { path: 'consumers', component: ConsumerallComponent, children: [
+      {path: ':id', component: ConprofileComponent},
       { path: '', component: NewconsumerComponent},
       { path: 'new', component: ConsumregComponent }
     ]
@@ -80,14 +84,18 @@ const routes: Routes = [
     LimitwarningComponent,
     DailychartComponent,
     WeeklychartComponent,
-    MonthlychartComponent,  ],
+    MonthlychartComponent,
+    ConprofileComponent,
+     ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
+    MatAutocompleteModule ,
     PushNotificationsModule,
     NgApexchartsModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
+    BrowserAnimationsModule
   ],
   exports: [RouterModule, CompareDirective  ],
   providers: [],

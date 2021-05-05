@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { environment } from "../../../../environments/environment";
-import { HttpClient,HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-consumerpending',
@@ -9,14 +9,14 @@ import { HttpClient,HttpHeaders } from '@angular/common/http';
 })
 export class ConsumerpendingComponent implements OnInit {
 
-  personList: Array<any>
-  act="active";
-  inact= "Inactive"
+  personList: Array<any>;
+  act = 'active';
+  inact = 'Inactive';
   constructor(private http: HttpClient) {
-    var token=localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
-    headers = headers.set('Authorization', 'Bearer '+token);
-    this.http.post<any>(environment.url+'/api/ConsumerUserInfo',{},{headers: headers}).subscribe(result => {
+    headers = headers.set('Authorization', 'Bearer ' + token);
+    this.http.post<any>(environment.url + '/api/ConsumerUserInfo', {}, {headers}).subscribe(result => {
        this.personList = result.Users;
         });
    }
@@ -27,14 +27,14 @@ export class ConsumerpendingComponent implements OnInit {
     this.personList[id][property] = editField;
   }
 
-  remove(id: any,data) {
+  remove(id: any, data) {
         this.personList.splice(id, 1);
-        var token=localStorage.getItem('token');
-    let headers = new HttpHeaders();
-    headers = headers.set('Authorization', 'Bearer '+token);
-    this.http.post<any>(environment.url+'/api/RemoveConsumerUserInfo',{consumedId:data},{headers: headers}).subscribe(result => {
-        if(result.status==1){
-          location.reload()
+        const token = localStorage.getItem('token');
+        let headers = new HttpHeaders();
+        headers = headers.set('Authorization', 'Bearer ' + token);
+        this.http.post<any>(environment.url + '/api/RemoveConsumerUserInfo', {consumedId: data}, {headers}).subscribe(result => {
+        if (result.status === 1){
+          location.reload();
         }
     });
 

@@ -336,12 +336,15 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     let storeday = []
     let storemonth = []
     let todayunit;
-    d.setDate(d.getDate() - 1);
+    d.setDate(d.getDate() - 2);
     d.setHours(00);
+    d.setMinutes(00);
+    d.setSeconds(00);
     var d = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
     n = m.getDate()
     m.setHours(00);
-    m.setDate(m.getDate() - n);
+    m.setMinutes(00);
+    m.setDate(m.getDate() - n + 1);
     var m = new Date(m.getTime() - m.getTimezoneOffset() * 60000)
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var yesterday = admin.firestore.Timestamp.fromDate(d)
@@ -352,7 +355,7 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
             querySnapshot.forEach((doc) => {
                 storeday.push(doc.data().unit)
             });
-            todayunit = storeday[1] - storeday[0]
+            todayunit = storeday[storeday.length - 1] - storeday[storeday.length - 2];
             db.collection("ConDashboard").where("consumerid", "==", req.con).get()
                 .then(function(q) {
                     q.forEach(function(doc) {
@@ -369,7 +372,7 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
             querySnapshot.forEach((doc) => {
                 lastm = doc.data().unit
             });
-            monthunit = storeday[1] - lastm;
+            monthunit = storeday[storeday.length - 1] - lastm;
             db.collection("ConDashboard").where("consumerid", "==", req.con).get()
                 .then(function(q) {
                     q.forEach(function(doc) {
@@ -716,4 +719,85 @@ app.post('/api/LastDueDate', conAuth, function(req, res) {
         });
 });
 
+app.post('/api/SearchUser', authenticateToken, function(req, res) {
+    var user = req.body.search;
+    store = [];
+    db.collection("Users").where("firstname", ">=", user).where("firstname", "<=", user).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                store.push({ "user": doc.data().username, "firstname": doc.data().firstname, "lastname": doc.data().lastname })
+            });
+            res.status(200).json({ status: 1, "users": store })
+        });
+});
+
+app.post('/api/ProfileUser', authenticateToken, function(req, res) {
+    var user = req.body.user;
+    var userid = {}
+    state = 0;
+    try {
+        db.collection("Users").where("board", "==", req.user).where("username", "<=", user).where("username", ">=", user).get()
+            .then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    userid = {
+                        "consumerid": doc.data().username,
+                        "firstname": doc.data().firstname,
+                        "lastname": doc.data().lastname,
+                        "email": doc.data().email,
+                        "phone": doc.data().phone,
+                        "address": doc.data().address,
+                        "city": doc.data().city,
+                        "pincode": doc.data().pincode,
+                    }
+                    state = 1
+                });
+                userid['status'] = state;
+                res.status(200).json(userid);
+            });
+    } catch (err) {
+        res.status(200).json({ status: 0 });
+    }
+});
+
+app.post('/api/UserConsumption', authenticateToken, function(req, res) {
+    var user = req.body.user;
+    var today = admin.firestore.Timestamp.now();
+    var d = new Date();
+    var mo = new Date()
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+    d.setDate(d.getDate() - 2);
+    n = mo.getDate();
+    mo.setHours(00);
+    mo.setDate(mo.getDate() - n + 1);
+    var date = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    var m = new Date(mo.getTime() - mo.getTimezoneOffset() * 60000);
+    console.log(m)
+    var yesterday = admin.firestore.Timestamp.fromDate(date);
+    var month = admin.firestore.Timestamp.fromDate(m);
+    store = [];
+    state = 0;
+    let UserRef = db.collection("Consumption").where("board", "==", req.user).where("consumerid", "==", user)
+    try {
+        UserRef.where("date", "<=", today).where("date", ">=", yesterday).get()
+            .then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    console.log(doc.data().unit)
+                    store.push(doc.data().unit)
+                });
+                daily = store[store.length - 1] - store[store.length - 2]
+                UserRef.where("date", "<=", today).where("date", ">=", month).limit(1).get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            lastd = doc.data().unit;
+                        });
+                        month = store[store.length - 1] - lastd;
+                        res.status(200).json({ status: 1, "daily": daily.toFixed(2), "month": month.toFixed(2), "reading": store[store.length - 1].toFixed(2) });
+                    });
+            });
+    } catch (err) {
+        res.status(200).json({ status: 0 });
+    }
+});
 app.listen(process.env.PORT || 3000);
