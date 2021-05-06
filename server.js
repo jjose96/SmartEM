@@ -97,34 +97,34 @@ app.post("/api/boardInfo", authenticateToken, function(req, res) {
 app.post('/api/ConsumerReg', authenticateToken, function(req, res) {
     var firstname = req.body.firstname;
     var lastname = req.body.lastname;
-    var username = req.body.username;
+    var username = String(req.body.username);
     var email = req.body.email;
     var phone = req.body.phone;
-    let UserRef = db.collection("Users")
+    let UserRef = db.collection("Users").where("username", "==", username)
     let state = 0;
-    console.log(username)
-    UserRef.where("username", ">=", username).get()
-        .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
                 state = 1;
-                console.log(doc.data())
             });
-            console.log(state);
-
+            if (state == 0) {
+                db.collection("Users").add({
+                    firstname: firstname,
+                    lastname: lastname,
+                    username: username,
+                    email: email,
+                    phone: phone,
+                    board: req.user,
+                    status: 0
+                });
+                db.collection("ConDashboard").add({
+                    username: username,
+                });
+                res.status(200).json({ status: 1 });
+            } else {
+                res.status(200).json({ status: 0 });
+            }
         });
-    // db.collection("Users").add({
-    //     firstname: firstname,
-    //     lastname: lastname,
-    //     username: username,
-    //     email: email,
-    //     phone: phone,
-    //     board: req.user,
-    //     status: 0
-    // });
-    // db.collection("ConDashboard").add({
-    //     username: username,
-    // });
-
 });
 
 app.post('/api/ConsumerUserInfo', authenticateToken, function(req, res) {

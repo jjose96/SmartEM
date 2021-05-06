@@ -65,7 +65,7 @@ body {
 /*----------------page-wrapper----------------*/
 
 .page-wrapper {
-    height: 100vh;
+    height: 100%;
 }
 
 .page-wrapper .theme {

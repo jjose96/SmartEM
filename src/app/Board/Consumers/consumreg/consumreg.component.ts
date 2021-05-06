@@ -8,7 +8,7 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./consumreg.component.css']
 })
 export class ConsumregComponent implements OnInit {
-status = 0;
+status = 2;
   constructor(private http: HttpClient) { }
 OnSubmit(data){
   const token = localStorage.getItem('token');
