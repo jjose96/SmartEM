@@ -16,6 +16,9 @@ address: string;
 phone: string;
 city: string;
 pincode: string;
+daily;
+month;
+reading;
 status;
   constructor(private http: HttpClient) {
     const userid = window.location.pathname.split('/').pop();
@@ -34,7 +37,9 @@ status;
       this.status = result.status;
         });
     this.http.post<any>(environment.url + '/api/UserConsumption', {user: userid}, {headers}).subscribe(result => {
-
+this.daily = result.daily;
+this.month = result.month;
+this.reading = result.reading;
             });
    }
 

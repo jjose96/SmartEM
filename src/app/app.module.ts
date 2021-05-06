@@ -42,9 +42,9 @@ const routes: Routes = [
   { path: 'dashboard', component: MergeComponent, children: [
     { path: '', component: DashboardComponent },
     { path: 'consumers', component: ConsumerallComponent, children: [
+      { path: 'new', component: ConsumregComponent },
       {path: ':id', component: ConprofileComponent},
       { path: '', component: NewconsumerComponent},
-      { path: 'new', component: ConsumregComponent }
     ]
   },
   {path: 'pending', component: ConsumerpendingComponent},

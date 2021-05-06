@@ -8,7 +8,7 @@
             <i class="fas fa-search input-prefix"></i>
             <input type="text" id="suffixInside" class="form-control" name="search" ngModel (input)="onSearchChange($event.target.value)">
             <div class="card" *ngFor="let x of options">
-                <a href="#">{{x.firstname}} {{x.lastname}} - {{x.user}}</a>
+                <a class="card-body" routerLink="{{x.user}}">{{x.firstname}} {{x.lastname}} - {{x.user}}</a>
             </div>
         </div>
     </div>
@@ -44,7 +44,7 @@
                     </td>
                     <td>
                         <span class="table-remove">
-              <button type="button" class="btn btn-info" rounded="true" size="sm">View profile</button>
+              <a routerLink="{{person.username}}" class="btn btn-info" rounded="true" size="sm">View profile</a>
             </span>
                     </td>
                 </tr>

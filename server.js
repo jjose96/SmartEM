@@ -100,18 +100,30 @@ app.post('/api/ConsumerReg', authenticateToken, function(req, res) {
     var username = req.body.username;
     var email = req.body.email;
     var phone = req.body.phone;
-    db.collection("Users").add({
-        firstname: firstname,
-        lastname: lastname,
-        username: username,
-        email: email,
-        phone: phone,
-        board: req.user,
-        status: 0
-    });
-    db.collection("ConDashboard").add({
-        username: username,
-    });
+    let UserRef = db.collection("Users")
+    let state = 0;
+    console.log(username)
+    UserRef.where("username", ">=", username).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                state = 1;
+                console.log(doc.data())
+            });
+            console.log(state);
+
+        });
+    // db.collection("Users").add({
+    //     firstname: firstname,
+    //     lastname: lastname,
+    //     username: username,
+    //     email: email,
+    //     phone: phone,
+    //     board: req.user,
+    //     status: 0
+    // });
+    // db.collection("ConDashboard").add({
+    //     username: username,
+    // });
 
 });
 
@@ -773,7 +785,6 @@ app.post('/api/UserConsumption', authenticateToken, function(req, res) {
     mo.setDate(mo.getDate() - n + 1);
     var date = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
     var m = new Date(mo.getTime() - mo.getTimezoneOffset() * 60000);
-    console.log(m)
     var yesterday = admin.firestore.Timestamp.fromDate(date);
     var month = admin.firestore.Timestamp.fromDate(m);
     store = [];
@@ -783,7 +794,6 @@ app.post('/api/UserConsumption', authenticateToken, function(req, res) {
         UserRef.where("date", "<=", today).where("date", ">=", yesterday).get()
             .then((querySnapshot) => {
                 querySnapshot.forEach((doc) => {
-                    console.log(doc.data().unit)
                     store.push(doc.data().unit)
                 });
                 daily = store[store.length - 1] - store[store.length - 2]
