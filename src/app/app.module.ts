@@ -32,6 +32,7 @@ import { MonthlychartComponent } from './Consumers/monthlychart/monthlychart.com
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { ConprofileComponent } from './Board/Consumers/conprofile/conprofile.component';
+import { MeterreaderComponent } from './Board/meterreader/meterreader.component';
 
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
@@ -86,6 +87,7 @@ const routes: Routes = [
     WeeklychartComponent,
     MonthlychartComponent,
     ConprofileComponent,
+    MeterreaderComponent,
      ],
   imports: [
     BrowserModule,

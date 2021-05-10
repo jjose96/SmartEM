@@ -291,7 +291,7 @@ app.post('/api/GetLimit', conAuth, function(req, res) {
 });
 app.post('/api/ReadingStatus', function(req, res) {
     var board = req.body.board;
-    var consumerid = req.body.consumerid;
+    var consumerid = String(req.body.consumerid);
     var unit = parseFloat(req.body.unit);
     var state = 0;
     var date = new Date(req.body.date);
@@ -301,7 +301,7 @@ app.post('/api/ReadingStatus', function(req, res) {
     todate.setSeconds(00);
     const todayAsTimestamp = admin.firestore.Timestamp.fromDate(date)
     var yesterday = admin.firestore.Timestamp.fromDate(todate)
-    let UserRef = db.collection('Consumption').where("consumerid", "==", "123456789")
+    let UserRef = db.collection('Consumption').where("consumerid", "==", consumerid)
     UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
@@ -810,4 +810,92 @@ app.post('/api/UserConsumption', authenticateToken, function(req, res) {
         res.status(200).json({ status: 0 });
     }
 });
+
+app.post('/api/LastBoard', authenticateToken, function(req, res) {
+    var d = new Date();
+    var n = d.getDate() + 1;
+    var w = d.getDate() - 7;
+    var qw = new Date();
+    c = -1;
+    var qe = new Date();
+    while (w < n) {
+        n--;
+        qw.setDate(n);
+        qw.setHours(23)
+        qw.setMinutes(59)
+        qw.setSeconds(59);
+        qe.setHours(0);
+        qe.setDate(n);
+        qe.setMinutes(0);
+        qe.setSeconds(0);
+        var up = new Date(qw.getTime() - qw.getTimezoneOffset() * 60000);
+        var down = new Date(qe.getTime() - qe.getTimezoneOffset() * 60000);
+        var from = admin.firestore.Timestamp.fromDate(down);
+        var to = admin.firestore.Timestamp.fromDate(up);
+        storea = []
+        var sum = 0;
+        db.collection("Consumption").where("board", "==", req.user).where("date", "<=", to).where("date", ">=", from).get()
+            .then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    sum = sum + doc.data().unit
+                    de = doc.data().date.toDate().toDateString();
+                });
+                c++;
+                storea.push({ 'x': de, 'y': sum.toFixed(3) });
+                sum = 0;
+                if (storea.length == 7) {
+                    sort = storea.sort(function(a, b) { return a.y - b.y })
+                    res.status(200).json({ 'week': sort })
+                }
+            });
+    }
+});
+
+app.post('/api/UsersTotal', authenticateToken, function(req, res) {
+    c = 0;
+    let UserRef = db.collection("Users").where("board", "==", req.user)
+    UserRef.get().then(snap => {
+        c = snap.size
+        res.status(200).send({ userc: c });
+    });
+});
+app.post('/api/UsersPending', authenticateToken, function(req, res) {
+    c = 0;
+    let UserRef = db.collection("Users").where("board", "==", req.user)
+    UserRef.where("status", "==", 0).get().then(snap => {
+        c = snap.size
+        res.status(200).send({ userp: c });
+    });
+});
+app.post('/api/LastDue', function(req, res) {
+    c = 0;
+    store = []
+    today = admin.firestore.Timestamp.now();
+    let UserRef = db.collection("BillRecord").where("board", "==", "kalanjoor")
+    UserRef.orderBy("duedate").get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                store.push(doc.data().duedate.toDate().toDateString());
+            });
+            res.status(200).send({ lastdue: store[store.length - 1] });
+
+        })
+
+});
+
+app.post('/api/RemoveCon', function(req, res) {
+    let UserRef = db.collection('Consumption').where("board", "==", "kalanjoor").where("consumerid", "==", "4347387431");
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    doc.ref.delete();
+                }
+            });
+        });
+    res.status(200).json({
+        'status': 1
+    });
+});
+
 app.listen(process.env.PORT || 3000);

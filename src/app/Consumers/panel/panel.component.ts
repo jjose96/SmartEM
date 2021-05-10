@@ -19,6 +19,8 @@ reversedList: Array<any>;
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', 'Bearer ' + token);
     this.http.post<any>(environment.url + '/api/ConsumerDashboard', {}, { headers }).subscribe(result => {
+     });
+    this.http.post<any>(environment.url + '/api/ConsumerDashboard', {}, { headers }).subscribe(result => {
               this.today = result.today;
               this.month = result.month;
              });

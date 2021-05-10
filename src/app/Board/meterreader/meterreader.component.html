@@ -1,0 +1,28 @@
+<div class="card card-white grid-margin">
+    <div class="card-body">
+        <h3 class="text-center">Daily Consumption</h3>
+    </div>
+    <div id="chart">
+        <apx-chart [series]="chartOptions2.series" [chart]="chartOptions2.chart" [xaxis]="chartOptions2.xaxis" [dataLabels]="chartOptions2.dataLabels" [grid]="chartOptions2.grid" [stroke]="chartOptions2.stroke" [title]="chartOptions2.title" [markers]="chartOptions2.markers"
+            [yaxis]="chartOptions2.yaxis" [fill]="chartOptions2.fill"></apx-chart>
+    </div>
+</div>
+<div class="card card-white grid-margin">
+    <div class="card-body">
+        <h3 class="text-center">Overall Consumption - Last Week</h3>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Meter Reading</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let q of ListData; let i = index">
+                <td>{{q.x}}</td>
+                <td>{{q.y}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
