@@ -843,7 +843,7 @@ app.post('/api/LastBoard', authenticateToken, function(req, res) {
                 c++;
                 storea.push({ 'x': de, 'y': sum.toFixed(3) });
                 sum = 0;
-                if (storea.length == 7) {
+                if (storea.length == 8) {
                     sort = storea.sort(function(a, b) { return a.y - b.y })
                     res.status(200).json({ 'week': sort })
                 }
