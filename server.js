@@ -187,7 +187,7 @@ app.post('/api/CreateUser', verifyUser, function(req, res) {
     }
 });
 app.post('/api/ConsumerUserInfo', authenticateToken, function(req, res) {
-    let UserRef = db.collection('Users').where("board", "==", req.user);
+    let UserRef = db.collection('Users').where("board", "==", req.user).limit(10);
     let Users = []
     UserRef.get()
         .then(function(q) {
@@ -204,7 +204,24 @@ app.post('/api/ConsumerUserInfo', authenticateToken, function(req, res) {
         });
 
 });
+app.post('/api/ConsumersPending', authenticateToken, function(req, res) {
+    let UserRef = db.collection('Users').where("board", "==", req.user).where("status", "==", 0);
+    let Users = []
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    let use = { "username": doc.data().username, "firstname": doc.data().firstname, "lastname": doc.data().lastname, "email": doc.data().email, "phone": doc.data().phone, "status": doc.data().status }
+                    Users.push(use);
+                }
+            });
+            res.status(200).json({
+                'status': 1,
+                Users
+            });
+        });
 
+});
 
 app.post('/api/RemoveConsumerUserInfo', authenticateToken, function(req, res) {
     var consId = req.body.consumedId;

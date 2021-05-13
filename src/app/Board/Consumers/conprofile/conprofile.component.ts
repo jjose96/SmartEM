@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-conprofile',
@@ -10,7 +11,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class ConprofileComponent implements OnInit {
 firstname: string;
 lastname: string;
-consumerid: string;
+consumerid;
 email: string;
 address: string;
 phone: string;
@@ -20,7 +21,7 @@ daily;
 month;
 reading;
 status;
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private location: Location) {
     const userid = window.location.pathname.split('/').pop();
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
@@ -42,8 +43,27 @@ this.month = result.month;
 this.reading = result.reading;
             });
    }
-
-  ngOnInit(): void {
+    ngOnInit(): void {
   }
 
+  remove() {
+    const x = confirm('Are you sure you want to delete this profile?');
+    if (x){
+     const data = window.location.pathname.split('/').pop();
+     const token = localStorage.getItem('token');
+     let headers = new HttpHeaders();
+     headers = headers.set('Authorization', 'Bearer ' + token);
+     this.http.post<any>(environment.url + '/api/RemoveConsumerUserInfo', {consumedId: data}, {headers}).subscribe(result => {
+     if (result.status === 1){
+       location.href = '/dashboard/consumers/';
+     }
+    });
+
+    }
+  }
+  goBack() {
+    // window.history.back();
+    this.location.back();
+
+  }
 }

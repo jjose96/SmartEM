@@ -37,10 +37,10 @@
                         <span>{{person.username}}</span>
                     </td>
                     <td *ngIf="person.status==0">
-                        <span *ngIf="person.status==0">{{inact}}</span>
+                        <span *ngIf="person.status==0" style="color:red">{{inact}}</span>
                     </td>
                     <td *ngIf="person.status==1">
-                        <span *ngIf="person.status==1">{{act}}</span>
+                        <span *ngIf="person.status==1" style="color:green">{{act}}</span>
                     </td>
                     <td>
                         <span class="table-remove">

@@ -23,7 +23,7 @@
                 </div>
             </div>
             <div class="col-md-2">
-                <button class="btn btn-danger" name="btnAddMore">Delete Profile</button>
+                <button class="btn btn-danger" name="btnAddMore" (click)=remove()>Delete Profile</button>
             </div>
         </div>
         <div class="row">
@@ -103,7 +103,7 @@
                         </div>
                     </div>
                     <p>
-                        <a routerLink="../" class="btn btn-warning">
+                        <a href="javascript:void(0)" (click)="goBack()" class="btn btn-warning">
                             Go back</a>
                     </p>
                 </div>

@@ -16,7 +16,7 @@ export class ConsumerpendingComponent implements OnInit {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', 'Bearer ' + token);
-    this.http.post<any>(environment.url + '/api/ConsumerUserInfo', {}, {headers}).subscribe(result => {
+    this.http.post<any>(environment.url + '/api/ConsumersPending', {}, {headers}).subscribe(result => {
        this.personList = result.Users;
         });
    }
