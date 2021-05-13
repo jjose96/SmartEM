@@ -33,7 +33,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { ConprofileComponent } from './Board/Consumers/conprofile/conprofile.component';
 import { MeterreaderComponent } from './Board/meterreader/meterreader.component';
-
+import { VerifyuserComponent } from './Board/verifyuser/verifyuser.component';
+import { VerifyPasswordDirective} from './Board/verifyuser/verifyuser.directive';
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
     { path: '', component: ConsumerComponent },
@@ -58,7 +59,8 @@ const routes: Routes = [
     {path: 'profile', component: ProfileComponent},
     {path: 'passwordchange', component: PasswordchangeComponent},
     {path: 'limit', component: LimitwarningComponent}
-  ]}
+  ]},
+  { path: 'verify', component: VerifyuserComponent }
 ];
 @NgModule({
   declarations: [
@@ -82,12 +84,14 @@ const routes: Routes = [
     BillsComponent,
     PasswordchangeComponent,
     CompareDirective,
+    VerifyPasswordDirective,
     LimitwarningComponent,
     DailychartComponent,
     WeeklychartComponent,
     MonthlychartComponent,
     ConprofileComponent,
     MeterreaderComponent,
+    VerifyuserComponent,
      ],
   imports: [
     BrowserModule,
@@ -99,7 +103,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     BrowserAnimationsModule
   ],
-  exports: [RouterModule, CompareDirective  ],
+  exports: [RouterModule, CompareDirective, VerifyPasswordDirective  ],
   providers: [],
   bootstrap: [AppComponent]
 })

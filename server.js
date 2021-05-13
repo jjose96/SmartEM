@@ -4,6 +4,7 @@ var cors = require('cors')
 const app = express();
 const jwt = require('jsonwebtoken');
 const sendmail = require('sendmail')();
+const nodemailer = require("nodemailer");
 app.use(cors());
 const body_parser = require('body-parser');
 app.use(body_parser.json());
@@ -17,6 +18,7 @@ admin.initializeApp({
     databaseURL: "https://smarte-8f70f.firebaseio.com"
 });
 var db = admin.firestore();
+db.settings({ ignoreUndefinedProperties: true })
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store')
     next()
@@ -28,9 +30,17 @@ app.get('/*', function(req, res) {
     res.sendFile(path.join(__dirname + '/dist/SmartEM/index.html'));
 });
 
-
+var transporter = nodemailer.createTransport({
+    service: "FastMail",
+    auth: {
+        user: "smartem@fastmail.com",
+        pass: "a2dy9uchfzhqnbs9"
+    }
+});
 const accessTokenSecret = 'youraccesstokensecret';
 const consumerTokenSecret = 'newtokenundreadable';
+const verifyTokenSecret = 'newtokenundreadable';
+
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -55,6 +65,18 @@ function conAuth(req, res, next) {
         req.con = user.consumerId;
         req.board = user.board;
         next()
+    })
+}
+
+function verifyUser(req, res, next) {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401) // if there isn't any token
+
+    jwt.verify(token, verifyTokenSecret, (err, user) => {
+        if (err) return res.status(200).json({ "status": "0" })
+        req.userid = user.userid;
+        next();
     })
 }
 
@@ -118,15 +140,52 @@ app.post('/api/ConsumerReg', authenticateToken, function(req, res) {
                     status: 0
                 });
                 db.collection("ConDashboard").add({
-                    username: username,
+                    consumerid: username,
                 });
+                let accessToken = jwt.sign({ userid: username }, verifyTokenSecret);
+                const mailOptions = {
+                    from: 'smartem@fastmail.com', // sender address
+                    to: email, // list of receivers
+                    subject: 'Verify User', // Subject line
+                    html: 'Hi, <br><p>Thank you for registering your account.<br>Please verify email and setup you account: https://smarte.herokuapp.com/verify?token=' + accessToken + '</p><br> Thank you' // plain text body
+                };
+                transporter.sendMail(mailOptions, function(err, info) {});
                 res.status(200).json({ status: 1 });
             } else {
                 res.status(200).json({ status: 0 });
             }
         });
 });
-
+app.post('/api/CreateUser', verifyUser, function(req, res) {
+    var address = req.body.address;
+    var city = req.body.city;
+    var pincode = req.body.pincode;
+    var password = req.body.password;
+    try {
+        let UserRef = db.collection('Users').where("username", "==", req.userid).where("status", "==", 0);
+        UserRef.get()
+            .then(function(q) {
+                q.forEach(function(doc) {
+                    if (doc.exists) {
+                        db.collection('Users').doc(doc.id).set({
+                            address: address,
+                            city: city,
+                            pincode: pincode,
+                            password: password,
+                            status: 1
+                        }, { merge: true })
+                    }
+                });
+                res.status(200).json({
+                    'status': 1
+                });
+            });
+    } catch (err) {
+        res.status(200).json({
+            'status': 0
+        });
+    }
+});
 app.post('/api/ConsumerUserInfo', authenticateToken, function(req, res) {
     let UserRef = db.collection('Users').where("board", "==", req.user);
     let Users = []
@@ -200,16 +259,13 @@ app.post("/api/userInfo", conAuth, function(req, res) {
 
 app.post("/api/mail", function(req, res) {
 
-    sendmail({
-        from: 'test@finra.org',
-        to: 'jekenod696@zcai55.com',
-        subject: 'Hello World',
-        html: 'Mail of test sendmail '
-    }, function(err, reply) {
-        console.log(err && err.stack)
-        console.dir(reply)
-    })
-    res.status(200).json({ 'status': "success" })
+    const mailOptions = {
+        from: 'smartem@fastmail.com', // sender address
+        to: 'jjose@cobaltcore.io', // list of receivers
+        subject: 'Subject of your email', // Subject line
+        html: '<p>Your html here</p>' // plain text body
+    };
+    transporter.sendMail(mailOptions, function(err, info) {});
 });
 
 app.post("/api/profileInfo", conAuth, function(req, res) {
@@ -781,6 +837,7 @@ app.post('/api/UserConsumption', authenticateToken, function(req, res) {
     d.setSeconds(0);
     d.setDate(d.getDate() - 2);
     n = mo.getDate();
+    lastd = 0;
     mo.setHours(00);
     mo.setDate(mo.getDate() - n + 1);
     var date = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
