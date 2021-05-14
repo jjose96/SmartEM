@@ -11,6 +11,7 @@ app.use(body_parser.json());
 app.use(body_parser.urlencoded({
     extended: true
 }));
+var cron = require('node-cron');
 var admin = require("firebase-admin");
 var serviceAccount = require("./smarte-8f70f-firebase-adminsdk-dc8il-f047b8760f.json");
 admin.initializeApp({
@@ -39,8 +40,18 @@ var transporter = nodemailer.createTransport({
 });
 const accessTokenSecret = 'youraccesstokensecret';
 const consumerTokenSecret = 'newtokenundreadable';
-const verifyTokenSecret = 'newtokenundreadable';
+const verifyTokenSecret = 'verifyTokenSecret_174';
+const adminTokenSecret = 'admin_admin@753';
 
+cron.schedule('* * * * *', () => {
+    app.post('/api/Date', function(req, res) {
+        const v = new Date()
+        v.setHours(0)
+        console.log(v);
+        var d = new Date(v.getTime() - v.getTimezoneOffset() * 60000)
+        res.status(200).json({ 'status': 1, 'date': d })
+    });
+});
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers.authorization;
@@ -80,6 +91,68 @@ function verifyUser(req, res, next) {
     })
 }
 
+function adminToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401)
+
+    jwt.verify(token, adminTokenSecret, (err, user) => {
+        if (err) return res.status(200).json({ "status": "0" })
+        req.admin = user.admin
+        next()
+    })
+}
+
+app.post('/api/admlogin', function(req, res) {
+    var user = req.body.username;
+    var pass = req.body.password;
+    var status = 0;
+    let UserRef = db.collection('Admin').where("username", "==", user).where("password", "==", pass);
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    const accessToken = jwt.sign({ admin: doc.data().username }, adminTokenSecret);
+                    res.status(200).json({ "status": "1", "auth": accessToken })
+                    status = 1
+                }
+            })
+            if (status == 0) {
+                res.status(200).json({ "status": "0" })
+            }
+        });
+});
+app.post("/api/adminInfo", adminToken, function(req, res) {
+    let UserRef = db.collection('Admin').where("username", "==", req.admin);
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    res.status(200).json({ 'status': 1, 'name': doc.data().username });
+                } else {
+                    res.status(200).json({ 'status': 0, name: 'invalid user' });
+                }
+            });
+        });
+});
+
+app.post("/api/BoardList", adminToken, function(req, res) {
+    let UserRef = db.collection('BoardUsers');
+    let Users = []
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    let use = { "name": doc.data().name, "user": doc.data().user }
+                    Users.push(use);
+                }
+            });
+            res.status(200).json({
+                'status': 1,
+                Users
+            });
+        });
+});
 app.post('/api/blogin', function(req, res) {
     var user = req.body.username;
     var pass = req.body.password;

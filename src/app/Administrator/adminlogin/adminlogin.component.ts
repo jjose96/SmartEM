@@ -3,18 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 @Component({
-  selector: 'app-consumer',
-  templateUrl: './consumer.component.html',
-  styleUrls: ['./consumer.component.css']
+  selector: 'app-adminlogin',
+  templateUrl: './adminlogin.component.html',
+  styleUrls: ['./adminlogin.component.css']
 })
-export class ConsumerComponent implements OnInit {
-   state = 1;
+export class AdminloginComponent implements OnInit {
+  state = 1;
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
   }
   OnSubmit(data){
-    this.http.post<any>(environment.url + '/api/login', { username: data.username,
+    this.http.post<any>(environment.url + '/api/admlogin', { username: data.username,
      password: data.password }).subscribe(result => {
       console.log(result.status);
       // tslint:disable-next-line:triple-equals
@@ -22,7 +22,7 @@ export class ConsumerComponent implements OnInit {
               console.log(result.status);
               localStorage.setItem('token', result.auth);
               localStorage.setItem('user', 'consumer');
-              location.replace('/userpanel');
+              location.replace('/administrator');
             }
             else{
               // tslint:disable-next-line:triple-equals
@@ -31,5 +31,10 @@ export class ConsumerComponent implements OnInit {
               }
             }
   });
+}
+
+Home(){
+  location.replace('/');
+  localStorage.removeItem('user');
 }
 }

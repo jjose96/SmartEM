@@ -35,6 +35,10 @@ import { ConprofileComponent } from './Board/Consumers/conprofile/conprofile.com
 import { MeterreaderComponent } from './Board/meterreader/meterreader.component';
 import { VerifyuserComponent } from './Board/verifyuser/verifyuser.component';
 import { VerifyPasswordDirective} from './Board/verifyuser/verifyuser.directive';
+import { AdminloginComponent } from './Administrator/adminlogin/adminlogin.component';
+import { AdmindashComponent } from './Administrator/admindash/admindash.component';
+import { HolderComponent } from './Administrator/holder/holder.component';
+import { AuthComponent } from './Administrator/auth/auth.component';
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
     { path: '', component: ConsumerComponent },
@@ -60,7 +64,13 @@ const routes: Routes = [
     {path: 'passwordchange', component: PasswordchangeComponent},
     {path: 'limit', component: LimitwarningComponent}
   ]},
-  { path: 'verify', component: VerifyuserComponent }
+  { path: 'verify', component: VerifyuserComponent },
+  { path: 'admin', component: AdminloginComponent},
+  { path: 'administrator', component: AuthComponent, children: [
+    { path: '', component: AdmindashComponent }
+  ]}
+
+
 ];
 @NgModule({
   declarations: [
@@ -92,6 +102,10 @@ const routes: Routes = [
     ConprofileComponent,
     MeterreaderComponent,
     VerifyuserComponent,
+    AdminloginComponent,
+    AdmindashComponent,
+    HolderComponent,
+    AuthComponent,
      ],
   imports: [
     BrowserModule,

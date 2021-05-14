@@ -1,0 +1,41 @@
+<div *ngIf="status==1">
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" style="padding-left: 2%;"> SMART EM Administrator</a>
+        <ul class="navbar-nav px-3">
+            <li class="nav-item text-nowrap">
+                <a class="nav-link" (click)="onLogout()">Sign out</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active">
+                                <span data-feather="home"></span> Dashboard <span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file"></span> Add new board
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="shopping-cart"></span> Price Slab
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+            </nav>
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>
+<div *ngIf="status==0" style="text-align: center; margin-top:250px">
+    <h1> Redirecting..............</h1>
+</div>

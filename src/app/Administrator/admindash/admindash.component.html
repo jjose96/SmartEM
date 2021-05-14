@@ -1,0 +1,24 @@
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+
+    <h2>Board Users</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Board name</th>
+                    <th>Username</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let x of personList; let i=index">
+                    <td>{{i+1}}</td>
+                    <td>{{x.name}}</td>
+                    <td>{{x.user}}</td>
+                    <td><button class="btn btn-primary">Remove</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>

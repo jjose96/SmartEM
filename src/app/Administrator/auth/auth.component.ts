@@ -1,34 +1,41 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
+
 @Component({
-  selector: 'app-merge',
-  templateUrl: './merge.component.html',
-  styleUrls: ['./merge.component.css']
+  selector: 'app-auth',
+  templateUrl: './auth.component.html',
+  styleUrls: ['./auth.component.css']
 })
-export class MergeComponent implements OnInit {
+export class AuthComponent implements OnInit {
+
   status;
   user;
   constructor(private http: HttpClient) {
     const token = localStorage.getItem('token');
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', 'Bearer ' + token);
-    this.http.post<any>(environment.url + '/api/boardInfo', {}, {headers}).subscribe(result => {
-       if (result.status === 1){
+    this.http.post<any>(environment.url + '/api/adminInfo', {}, {headers}).subscribe(result => {
+       // tslint:disable-next-line:triple-equals
+       if (result.status == 1){
               this.status = 1;
               this.user = result.name;
              }
-      else if (result.status === 0){
+      // tslint:disable-next-line:triple-equals
+      else if (result.status == 0){
         this.status = 0;
         window.alert('Session expired ! Login again');
-        location.replace('/');
+        location.replace('/admin');
       }
       else{}
   });
 }
 
-
+onLogout(){
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  location.replace('/admin');
+}
   ngOnInit(): void {
   }
-
 }
