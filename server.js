@@ -14,6 +14,7 @@ app.use(body_parser.urlencoded({
 var cron = require('node-cron');
 var admin = require("firebase-admin");
 var serviceAccount = require("./smarte-8f70f-firebase-adminsdk-dc8il-f047b8760f.json");
+const { state } = require('@angular/animations');
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://smarte-8f70f.firebaseio.com"
@@ -43,14 +44,57 @@ const consumerTokenSecret = 'newtokenundreadable';
 const verifyTokenSecret = 'verifyTokenSecret_174';
 const adminTokenSecret = 'admin_admin@753';
 
-cron.schedule('* * * * *', () => {
-    app.post('/api/Date', function(req, res) {
-        const v = new Date()
-        v.setHours(0)
-        console.log(v);
-        var d = new Date(v.getTime() - v.getTimezoneOffset() * 60000)
-        res.status(200).json({ 'status': 1, 'date': d })
-    });
+cron.schedule('0 */1 * * *', () => {
+    const todayAsTimestamp = admin.firestore.Timestamp.now()
+    var d = new Date;
+    d.setDate(d.getDate() - 1);
+    d.setHours(00);
+    d.setMinutes(00);
+    d.setSeconds(00);
+    var store = [];
+    var data = [];
+    var con = [];
+    var state = 0;
+    var d = new Date(d.getTime() - d.getTimezoneOffset() * 60000)
+    const late = admin.firestore.Timestamp.fromDate(d);
+    db.collection('Users').get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                store.push(doc.data().username)
+            });
+            for (i = 0; i < store.length; i++) {
+                let UserRef = db.collection('Consumption').where("date", "<=", todayAsTimestamp).where("date", ">=", late).where("consumerid", "==", store[i])
+                UserRef.get()
+                    .then(function(q) {
+                        q.forEach(function(doc) {
+                            if (doc.exists) {
+                                data.push(doc.data().unit);
+                                con.push(doc.data().consumerid);
+                            }
+                        });
+                        today = data[data.length - 1] - data[0];
+                        let LimitRef = db.collection('Limit').doc(con[0])
+                        LimitRef.get().then((doc) => {
+                            if (doc.exists) {
+                                if (today > doc.data().limit && doc.data().limit != 0) {
+                                    console.log("send");
+                                    const mailOptions = {
+                                        from: 'smartem@fastmail.com',
+                                        to: doc.data().email,
+                                        subject: 'Usage Warning',
+                                        html: 'Hi, <br> Warning your daily usage exceeds<br> Thank you' // plain text body
+                                    };
+                                    transporter.sendMail(mailOptions, function(err, info) {});
+                                }
+
+                            }
+                        }).catch((error) => {});
+                        data = [];
+                        con = [];
+                    }).catch((error) => {});
+            }
+
+        });
 });
 
 function authenticateToken(req, res, next) {
@@ -412,14 +456,22 @@ app.post('/api/PasswordChange', conAuth, function(req, res) {
 });
 
 app.post('/api/SetLimit', conAuth, function(req, res) {
-    var unit = req.body.unit;
+    var unit = parseInt(req.body.unit);
     let status = 0
-    let UserRef = db.collection('Limit').doc(req.con);
-    UserRef.set({
-        board: req.board,
-        consumerid: req.con,
-        limit: unit
-    }, { merge: true });
+    db.collection("Users").where("username", "==", req.con).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                email = doc.data().email
+            });
+            let UserRef = db.collection('Limit').doc(req.con);
+            UserRef.set({
+                board: req.board,
+                email: email,
+                consumerid: req.con,
+                limit: unit
+            }, { merge: true });
+        });
+
     res.status(200).json({ 'status': 1 });
 });
 app.post('/api/GetLimit', conAuth, function(req, res) {
@@ -442,11 +494,15 @@ app.post('/api/ReadingStatus', function(req, res) {
     var state = 0;
     var date = new Date(req.body.date);
     var todate = new Date(req.body.date);
+    var condate = new Date(req.body.date);
     todate.setHours(00);
     todate.setMinutes(00);
     todate.setSeconds(00);
+    condate.setDate(todate.getDate() - 1)
     const todayAsTimestamp = admin.firestore.Timestamp.fromDate(date)
     var yesterday = admin.firestore.Timestamp.fromDate(todate)
+    var previous = admin.firestore.Timestamp.fromDate(condate)
+
     let UserRef = db.collection('Consumption').where("consumerid", "==", consumerid)
     UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
         .then((querySnapshot) => {
@@ -514,36 +570,28 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
                 storeday.push(doc.data().unit)
             });
             todayunit = storeday[storeday.length - 1] - storeday[storeday.length - 2];
-            db.collection("ConDashboard").where("consumerid", "==", req.con).get()
-                .then(function(q) {
-                    q.forEach(function(doc) {
-                        if (doc.exists) {
-                            db.collection('ConDashboard').doc(doc.id).set({
-                                today: todayunit
-                            }, { merge: true })
-                        }
+            UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        lastm = doc.data().unit
                     });
-                });
-        });
-    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
-        .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                lastm = doc.data().unit
-            });
-            monthunit = storeday[storeday.length - 1] - lastm;
-            db.collection("ConDashboard").where("consumerid", "==", req.con).get()
-                .then(function(q) {
-                    q.forEach(function(doc) {
-                        if (doc.exists) {
-                            db.collection('ConDashboard').doc(doc.id).set({
-                                month: monthunit
-                            }, { merge: true })
-                        }
-                    });
-                });
+                    monthunit = storeday[storeday.length - 1] - lastm;
+                    db.collection("ConDashboard").where("consumerid", "==", req.con).get()
+                        .then(function(q) {
+                            q.forEach(function(doc) {
+                                if (doc.exists) {
+                                    db.collection('ConDashboard').doc(doc.id).set({
+                                        today: todayunit,
+                                        month: monthunit
+                                    }, { merge: true })
+                                }
+                            });
+                        });
 
 
+                });
         });
+
 
     db.collection("ConDashboard").where("consumerid", "==", req.con).get()
         .then(function(q) {
