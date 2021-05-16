@@ -82,7 +82,7 @@ cron.schedule('0 */1 * * *', () => {
                                         from: 'smartem@fastmail.com',
                                         to: doc.data().email,
                                         subject: 'Usage Warning',
-                                        html: 'Hi, <br> Warning your daily usage exceeds<br> Thank you' // plain text body
+                                        html: 'Hi, <br> Warning your daily usage exceeds. You will receive this warning every 1 hour. In order turn off, log in to the application and set the limit to 0. <br> Thank you' // plain text body
                                     };
                                     transporter.sendMail(mailOptions, function(err, info) {});
                                 }
