@@ -1,0 +1,18 @@
+<div class="arr">
+    <div class="card">
+        <h3 class="card-header stylish-color-dark lighten-1 white-text text-uppercase font-weight-bold text-center py-5">FORGOT MY PASSWORD</h3>
+        <div class="card-body aaa">
+
+            <form method="POST" #userlogin="ngForm" (ngSubmit)="OnSubmit(userlogin.value)">
+                <div class="md-form input-with-post-icon">
+                    <i class="fas fa-user input-prefix"></i>
+                    <input type="text" id="suffixInside" class="form-control" name="consumerid" ngModel>
+                    <label for="suffixInside">Consumer Id </label>
+                </div>
+                <input type="submit" class="btn btn-primary spc" value="Submit">
+            </form>
+            <div style="margin-top: 10px;"></div>
+            <button routerLink="/" class="btn btn-info">Go back</button>
+        </div>
+    </div>
+</div>

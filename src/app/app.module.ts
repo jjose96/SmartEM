@@ -39,11 +39,15 @@ import { AdminloginComponent } from './Administrator/adminlogin/adminlogin.compo
 import { AdmindashComponent } from './Administrator/admindash/admindash.component';
 import { HolderComponent } from './Administrator/holder/holder.component';
 import { AuthComponent } from './Administrator/auth/auth.component';
+import { ForgotpassComponent } from './Home/forgotpass/forgotpass.component';
+import { PasswordresetComponent } from './Home/passwordreset/passwordreset.component';
+import {PasswordResetDirective} from './Home/passwordreset/passwordreset.directive';
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
     { path: '', component: ConsumerComponent },
     { path: 'board', component: BoardComponent },
-    { path: 'register', component: ConsumregComponent },
+    { path: 'forgot', component: ForgotpassComponent },
+    { path: 'passwordreset', component: PasswordresetComponent },
   ]},
   { path: 'dashboard', component: MergeComponent, children: [
     { path: '', component: DashboardComponent },
@@ -95,6 +99,7 @@ const routes: Routes = [
     PasswordchangeComponent,
     CompareDirective,
     VerifyPasswordDirective,
+    PasswordResetDirective,
     LimitwarningComponent,
     DailychartComponent,
     WeeklychartComponent,
@@ -106,6 +111,8 @@ const routes: Routes = [
     AdmindashComponent,
     HolderComponent,
     AuthComponent,
+    ForgotpassComponent,
+    PasswordresetComponent,
      ],
   imports: [
     BrowserModule,
@@ -117,7 +124,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     BrowserAnimationsModule
   ],
-  exports: [RouterModule, CompareDirective, VerifyPasswordDirective  ],
+  exports: [RouterModule, CompareDirective, VerifyPasswordDirective, PasswordResetDirective  ],
   providers: [],
   bootstrap: [AppComponent]
 })

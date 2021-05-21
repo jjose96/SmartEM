@@ -43,6 +43,7 @@ const accessTokenSecret = 'youraccesstokensecret';
 const consumerTokenSecret = 'newtokenundreadable';
 const verifyTokenSecret = 'verifyTokenSecret_174';
 const adminTokenSecret = 'admin_admin@753';
+const ForgotToken = 'user_forgot@852';
 
 cron.schedule('0 */1 * * *', () => {
     const todayAsTimestamp = admin.firestore.Timestamp.now()
@@ -147,6 +148,17 @@ function adminToken(req, res, next) {
     })
 }
 
+function ForgotUserToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401)
+
+    jwt.verify(token, ForgotToken, (err, user) => {
+        if (err) return res.status(200).json({ "status": "0" })
+        req.admin = user.admin
+        next()
+    })
+}
 app.post('/api/admlogin', function(req, res) {
     var user = req.body.username;
     var pass = req.body.password;
@@ -391,17 +403,28 @@ app.post("/api/userInfo", conAuth, function(req, res) {
         });
 });
 
-app.post("/api/mail", function(req, res) {
+app.post("/api/forgot", function(req, res) {
+    consumerid = req.body.consumerid;
+    let UserRef = db.collection('Users').where("username", "==", consumerid);
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    email = doc.data().email;
+                }
+            });
+            let accessToken = jwt.sign({ userid: consumerid }, ForgotToken);
+            const mailOptions = {
+                from: 'smartem@fastmail.com',
+                to: email,
+                subject: 'SMARTEM: Forgot my password request',
+                html: 'Hi, <br> As per your request, you are getting a password reset link. Use the password reset link to reset the password <br>' + accessToken + '<br>Thank you' // plain text body
+            };
+            transporter.sendMail(mailOptions, function(err, info) {});
+        });
+    res.status(200).json({ 'status': 1 });
 
-    const mailOptions = {
-        from: 'smartem@fastmail.com', // sender address
-        to: 'jjose@cobaltcore.io', // list of receivers
-        subject: 'Subject of your email', // Subject line
-        html: '<p>Your html here</p>' // plain text body
-    };
-    transporter.sendMail(mailOptions, function(err, info) {});
 });
-
 app.post("/api/profileInfo", conAuth, function(req, res) {
     let UserRef = db.collection('Users').where("username", "==", req.con);
     UserRef.get()
@@ -905,13 +928,32 @@ app.post('/api/UserBills', conAuth, function(req, res) {
                 var charge = doc.data().charge;
                 var state = doc.data().state;
                 var consumed = doc.data().consumed;
-                var use = { 'billfrom': billfrom, 'billto': billto, 'duedate': duedate, 'charge': charge, 'state': state, 'consumed': consumed }
+                var billid = doc.data().timestamp;
+                var use = { 'billfrom': billfrom, 'billto': billto, 'duedate': duedate, 'charge': charge.toFixed(2), 'state': state, 'consumed': consumed.toFixed(2), "billid": billid }
                 store.push(use)
 
             });
             res.status(200).json({ 'record': store });
 
         });
+
+});
+
+app.post('/api/PayBill', conAuth, function(req, res) {
+    var billid = req.body.billid;
+    store = [];
+    let BillRef = db.collection("Bills").where("consumerid", "==", req.con).where("timestamp", "==", billid)
+    BillRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    db.collection("Bills").doc(doc.id).set({
+                        state: true
+                    }, { merge: true })
+                }
+            });
+        });
+    res.status(200).json({ 'status': 1 });
 
 });
 app.post('/api/LastDueDate', conAuth, function(req, res) {
