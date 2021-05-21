@@ -155,7 +155,7 @@ function ForgotUserToken(req, res, next) {
 
     jwt.verify(token, ForgotToken, (err, user) => {
         if (err) return res.status(200).json({ "status": "0" })
-        req.admin = user.admin
+        req.userid = user.userid;
         next()
     })
 }
@@ -418,12 +418,35 @@ app.post("/api/forgot", function(req, res) {
                 from: 'smartem@fastmail.com',
                 to: email,
                 subject: 'SMARTEM: Forgot my password request',
-                html: 'Hi, <br> As per your request, you are getting a password reset link. Use the password reset link to reset the password <br>' + accessToken + '<br>Thank you' // plain text body
+                html: 'Hi, <br> As per your request, you are getting a password reset link. Use the password reset link to reset the password <br> https://smarte.herokuapp.com/passwordreset?token=' + accessToken + '<br>Thank you' // plain text body
             };
             transporter.sendMail(mailOptions, function(err, info) {});
         });
     res.status(200).json({ 'status': 1 });
 
+});
+app.post('/api/PasswordReset', ForgotUserToken, function(req, res) {
+    var password = req.body.password;
+    try {
+        let UserRef = db.collection('Users').where("username", "==", req.userid);
+        UserRef.get()
+            .then(function(q) {
+                q.forEach(function(doc) {
+                    if (doc.exists) {
+                        db.collection('Users').doc(doc.id).set({
+                            password: password,
+                        }, { merge: true })
+                    }
+                });
+                res.status(200).json({
+                    'status': 1
+                });
+            });
+    } catch (err) {
+        res.status(200).json({
+            'status': 0
+        });
+    }
 });
 app.post("/api/profileInfo", conAuth, function(req, res) {
     let UserRef = db.collection('Users').where("username", "==", req.con);

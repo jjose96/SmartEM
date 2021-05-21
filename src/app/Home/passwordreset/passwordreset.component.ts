@@ -11,7 +11,7 @@ import {Router} from '@angular/router';
 })
 export class PasswordresetComponent implements OnInit {
   public users: User;
-state = 2;
+state;
 note;
   constructor(private http: HttpClient, private router: Router) { }
   onSubmit(data){
@@ -21,12 +21,16 @@ note;
     headers = headers.set('Authorization', 'Bearer ' + token);
     this.http.post<any>(environment.url + '/api/PasswordReset'
       // tslint:disable-next-line:max-line-length
-      , {address: data.address, city: data.city, pincode: data.pincode, password: data.txtPassword}
+      , {password: data.txtPassword}
       , {headers})
       .subscribe(result => {
         this.state = result.status;
-        if (this.state){
-          const x = confirm('Profile verified ! Goto Login');
+        console.log(result.status);
+        // tslint:disable-next-line:triple-equals
+        if (this.state == 1){
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          const x = confirm('Password Changed ! Goto Login');
           if (x){
             this.router.navigateByUrl('/');
 
@@ -34,7 +38,7 @@ note;
         }
         else{
           this.state = 0;
-          this.note = 'Account already verified or token got expired';
+          this.note = 'Invalid token';
         }
     });
   }
