@@ -1,0 +1,66 @@
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <h2>Current Price Slab</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Upto</th>
+                    <th>Unit Charge</th>
+                    <th>Fixed</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let x of BillRecords; let i=index">
+                    <td>{{i+1}}</td>
+                    <td>{{x.upto}}</td>
+                    <td>{{x.price}}</td>
+                    <td>{{x.fixed}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <p>Remove All Price Slab Records: <button class="btn btn-primary" (click)="SlabRemove()">Remove</button></p>
+    <hr>
+    <form #addressForm="ngForm" class="container mt-3" (ngSubmit)="logValue()">
+        <button type="button" class="btn btn-primary mb-2" (click)="addAddress()">Add Rate Slab</button>
+        <section class="container border mb-4 p-3" *ngFor="let address of addresses; let i = index;">
+            <div class="row">
+                <div class="col-6">
+                    <h4>Price Slab {{i + 1}}</h4>
+                </div>
+                <div class="col-6 text-right">
+                    <button type="button" class="btn btn-danger btn-sm" (click)="removeAddress(i)">Remove</button>
+                </div>
+            </div>
+            <div class="col-6">
+
+                <div class="form-group">
+                    <label>Upto (Unit less than)</label>
+                    <input type="number" class="form-control" [(ngModel)]="address.from" name="address_{{address.id}}" placeholder="0" />
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Fixed Charge (Rs)</label>
+                    <input type="number" class="form-control" [(ngModel)]="address.to" name="street_{{address.id}}" placeholder="30" />
+                </div>
+            </div>
+            <div class="col-6">
+
+                <div class="form-group">
+                    <label>Per Unit Charge (Rs)</label>
+                    <input type="number" class="form-control" [(ngModel)]="address.price" name="city_{{address.id}}" placeholder="5" />
+                </div>
+            </div>
+
+        </section>
+
+        <div class="text-right">
+            <input type="submit" class="btn btn-success" value="Submit" />
+        </div>
+
+
+    </form>
+</main>

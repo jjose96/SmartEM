@@ -42,6 +42,8 @@ import { AuthComponent } from './Administrator/auth/auth.component';
 import { ForgotpassComponent } from './Home/forgotpass/forgotpass.component';
 import { PasswordresetComponent } from './Home/passwordreset/passwordreset.component';
 import {PasswordResetDirective} from './Home/passwordreset/passwordreset.directive';
+import { AddboardComponent } from './Administrator/addboard/addboard.component';
+import { PriceslabComponent } from './Administrator/priceslab/priceslab.component';
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
     { path: '', component: ConsumerComponent },
@@ -71,7 +73,11 @@ const routes: Routes = [
   { path: 'verify', component: VerifyuserComponent },
   { path: 'admin', component: AdminloginComponent},
   { path: 'administrator', component: AuthComponent, children: [
-    { path: '', component: AdmindashComponent }
+    { path: '', component: AdmindashComponent },
+    { path: 'addboard', component: AddboardComponent },
+    { path: 'priceslab', component: PriceslabComponent }
+
+
   ]}
 
 
@@ -113,6 +119,8 @@ const routes: Routes = [
     AuthComponent,
     ForgotpassComponent,
     PasswordresetComponent,
+    AddboardComponent,
+    PriceslabComponent,
      ],
   imports: [
     BrowserModule,

@@ -192,6 +192,29 @@ app.post("/api/adminInfo", adminToken, function(req, res) {
         });
 });
 
+app.post('/api/CreateBoard', adminToken, function(req, res) {
+    var name = req.body.name;
+    var user = String(req.body.user);
+    var password = req.body.password;
+    let UserRef = db.collection("BoardUsers").where("user", "==", user)
+    let state = 0;
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                state = 1;
+            });
+            if (state == 0) {
+                db.collection("BoardUsers").add({
+                    name: name,
+                    user: user,
+                    password: password,
+                });
+                res.status(200).json({ status: 1 });
+            } else {
+                res.status(200).json({ status: 0 });
+            }
+        });
+});
 app.post("/api/BoardList", adminToken, function(req, res) {
     let UserRef = db.collection('BoardUsers');
     let Users = []
@@ -206,6 +229,25 @@ app.post("/api/BoardList", adminToken, function(req, res) {
             res.status(200).json({
                 'status': 1,
                 Users
+            });
+        });
+});
+
+app.post("/api/PriceList", adminToken, function(req, res) {
+    let UserRef = db.collection('Price');
+    let Price = []
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    let use = { "upto": doc.data().upto, "fixed": doc.data().fixed, "price": doc.data().price }
+                    Price.push(use);
+                }
+            });
+            sort = Price.sort(function(a, b) { return a.upto - b.upto })
+            res.status(200).json({
+                'status': 1,
+                sort
             });
         });
 });
@@ -413,7 +455,7 @@ app.post("/api/forgot", function(req, res) {
                     email = doc.data().email;
                 }
             });
-            let accessToken = jwt.sign({ userid: consumerid }, ForgotToken);
+            let accessToken = jwt.sign({ userid: consumerid }, ForgotToken, { expiresIn: '1h' });
             const mailOptions = {
                 from: 'smartem@fastmail.com',
                 to: email,
@@ -803,46 +845,57 @@ app.post('/api/Date', function(req, res) {
     res.status(200).json({ 'status': 1, 'date': d })
 });
 
-// app.post('/api/BillSlab', function(req, res) {
-//     var data = req.body.data;
-//     let UserRef = db.collection('Price').where("board", "==", "kalanjoor")
-//     for(int i=0;i<data.length;i++){
-//       UserRef..where("date", ">=", todate).get()
-//           .then((querySnapshot) => {
-//               querySnapshot.forEach((doc) => {
-//                   if (doc.exists) {
-//                       db.collection("Consumption").doc(doc.id).set({
-//                           unit: unit,
-//                           date: date,
-//                       }, { merge: true });
-//                   }
-//                   state = 1;
-//               });
-//               if (state == 0) {
-//                   db.collection("Consumption").add({
-//                       board: board,
-//                       consumerid: consumerid,
-//                       unit: unit,
-//                       date: date,
-//                   });
-//               }
-//           });
-//     }
-//     res.status(200).json({ status: '1' })
-// });
+app.post('/api/BillSlab', adminToken, function(req, res) {
+    var data = req.body.data;
+    let UserRef = db.collection('Price')
+        // UserRef.get()
+        //     .then(function(q) {
+        //         q.forEach(function(doc) {
+        //             if (doc.exists) {
+        //                 doc.ref.delete();
+        //             }
+        //         });
+        //     });
+    for (i = 0; i < data.length; i++) {
+        console.log(data[i]);
+        UserRef.add({
+            id: data[i].id,
+            upto: data[i].from,
+            fixed: data[i].to,
+            price: data[i].price
+        });
+    }
+    res.status(200).json({ status: '1' })
+});
+
+app.post('/api/SlabRemove', adminToken, function(req, res) {
+    var data = req.body.data;
+    let UserRef = db.collection('Price')
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    doc.ref.delete();
+                }
+            });
+        });
+    res.status(200).json({ status: '1' })
+});
 app.post('/api/MonthlyCharge', conAuth, function(req, res) {
     month = 0;
     db.collection("ConDashboard").where("consumerid", "==", req.con).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
-                month = doc.data().month
+                // month = doc.data().month
+                month = 102;
             });
-            let PRef = db.collection("Price").where("from", "<=", month).get()
+            let PRef = db.collection("Price").where("upto", "<", month).get()
                 .then((querySnapshot) => {
                     querySnapshot.forEach((doc) => {
                         price = doc.data().price;
                     });
                     fin = (month * price) + 30
+                    console.log(price, month)
                     res.status(200).json({ 'status': 1, 'charge': fin.toFixed(2) })
 
                 });
@@ -887,12 +940,13 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
                         if (store.length > 0) {
                             charges = 0;
                             charges = store[store.length - 1] - store[0];
-                            let PRef = db.collection("Price").where("from", "<", charges).get()
+                            let PRef = db.collection("Price").where("upto", "<", charges).get()
                                 .then((querySnapshot) => {
                                     querySnapshot.forEach((doc) => {
                                         price = doc.data().price;
+                                        fixed = doc.data().fixed;
                                     });
-                                    fin = (charges * price) + 30
+                                    fin = (charges * price) + fixed;
                                     db.collection("Bills").add({
                                         timestamp: now,
                                         billfrom: billf,

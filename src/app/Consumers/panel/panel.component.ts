@@ -20,17 +20,21 @@ reversedList: Array<any>;
     headers = headers.set('Authorization', 'Bearer ' + token);
     this.http.post<any>(environment.url + '/api/ConsumerDashboard', {}, { headers }).subscribe(result => {
      });
+    this.delay(2000).then(() => {
     this.http.post<any>(environment.url + '/api/ConsumerDashboard', {}, { headers }).subscribe(result => {
               this.today = result.today;
               this.month = result.month;
              });
+            });
     this.http.post<any>(environment.url + '/api/Last7Days', {}, {headers}).subscribe(result => {
               this.WeekList = result.week;
               this.reversedList = this.WeekList.slice().reverse();
                });
+    this.delay(2000).then(() => {
     this.http.post<any>(environment.url + '/api/MonthlyCharge', {}, {headers}).subscribe(result => {
               this.monthprice = result.charge;
            });
+          });
     this.http.post<any>(environment.url + '/api/LastDueDate', {}, {headers}).subscribe(result => {
             this.duedate = result.duedate;
          });
@@ -38,6 +42,9 @@ reversedList: Array<any>;
    reload(){
     location.reload();
    }
+   async delay(ms: number) {
+    await new Promise<void>(resolve => setTimeout(() => resolve(), ms)).then(() => console.log());
+  }
   ngOnInit(): void {
   }
 }

@@ -1,0 +1,50 @@
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+    <div class="arr">
+        <div class="card" *ngIf="status==1">
+            <div class="card-body">
+                <div class="text-success">
+                    Board User Account Created !
+                </div>
+            </div>
+        </div>
+        <div class="card" *ngIf="status==0">
+            <div class="card-body">
+                <div class="text-danger">
+                    Board username already registered!
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-5">
+            <h3 class="card-header bg-dark lighten-1 white-text text-uppercase font-weight-bold text-center py-5"> BOARD REGISTRATION</h3>
+            <div class="card-body aaa">
+                <!-- Default form register -->
+                <form method="POST" #userreg="ngForm" (ngSubmit)="OnSubmit(userreg.value)">
+                    <div class="form-row mb-4">
+                        <div class="col">
+                            <!-- First name -->
+                            <input type="text" id="defaultRegisterFormFirstName" class="form-control" placeholder="Board Name" name="name" ngModel required>
+                        </div>
+                    </div>
+                    <input type="text" id="username" class="form-control mb-4" placeholder="Username" name="user" ngModel required>
+                    <!-- E-mail -->
+                    <input type="password" id="defaultRegisterFormEmail" class="form-control mb-4" placeholder="Password" name="password" ngModel required>
+
+                    <!-- Password -->
+
+                    <!-- Phone number -->
+
+                    <div class="row">
+                        <div class="d-flex justify-content-center">
+                            <input type="submit" [disabled]="!userreg.valid" class="btn btn-success" value="Create Board" data-toggle="modal" data-target="#exampleModal">
+                            <button type="button" routerLink="../" class="btn btn-warning">Cancel</button>
+                        </div>
+                    </div>
+                    <!-- Sign up button -->
+
+                </form>
+                <!-- Default form register -->
+                <div style="margin-top: 10px;"></div>
+            </div>
+        </div>
+    </div>
+</main>
