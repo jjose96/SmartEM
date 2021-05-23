@@ -14,11 +14,13 @@ export class MergeComponent implements OnInit {
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', 'Bearer ' + token);
     this.http.post<any>(environment.url + '/api/boardInfo', {}, {headers}).subscribe(result => {
-       if (result.status === 1){
+       // tslint:disable-next-line:triple-equals
+       if (result.status == 1){
               this.status = 1;
               this.user = result.name;
              }
-      else if (result.status === 0){
+      // tslint:disable-next-line:triple-equals
+      else if (result.status == 0){
         this.status = 0;
         window.alert('Session expired ! Login again');
         location.replace('/');

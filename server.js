@@ -543,6 +543,33 @@ app.post('/api/PasswordChange', conAuth, function(req, res) {
 
 });
 
+app.post('/api/BPasswordChange', authenticateToken, function(req, res) {
+    var cpass = req.body.password;
+    var npass = req.body.newpassword;
+    var state = 0;
+    let UserRef = db.collection('BoardUsers').where("user", "==", req.user).where("password", "==", cpass);
+    UserRef.get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                if (doc.exists) {
+                    db.collection('BoardUsers').doc(doc.id).update({
+                        password: npass
+                    });
+                    state = 1
+
+                }
+            });
+            if (state == 1) {
+                res.status(200).json({ 'status': 1 });
+
+            } else {
+                res.status(200).json({ 'status': 0 });
+
+            }
+        });
+
+});
+
 app.post('/api/SetLimit', conAuth, function(req, res) {
     var unit = parseInt(req.body.unit);
     let status = 0

@@ -44,6 +44,8 @@ import { PasswordresetComponent } from './Home/passwordreset/passwordreset.compo
 import {PasswordResetDirective} from './Home/passwordreset/passwordreset.directive';
 import { AddboardComponent } from './Administrator/addboard/addboard.component';
 import { PriceslabComponent } from './Administrator/priceslab/priceslab.component';
+import { BoardpasschangeComponent } from './Board/boardpasschange/boardpasschange.component';
+import { BPassDirective } from './Board/boardpasschange/boardpasschange.directive';
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
     { path: '', component: ConsumerComponent },
@@ -60,7 +62,8 @@ const routes: Routes = [
     ]
   },
   {path: 'pending', component: ConsumerpendingComponent},
-  {path: 'bills', component: BillsComponent}
+  {path: 'bills', component: BillsComponent},
+  {path: 'passchange', component: BoardpasschangeComponent}
   ]},
   { path: 'userpanel', component: UserpanelComponent, children: [
     { path: '', component: PanelComponent },
@@ -106,6 +109,7 @@ const routes: Routes = [
     CompareDirective,
     VerifyPasswordDirective,
     PasswordResetDirective,
+    BPassDirective,
     LimitwarningComponent,
     DailychartComponent,
     WeeklychartComponent,
@@ -121,6 +125,7 @@ const routes: Routes = [
     PasswordresetComponent,
     AddboardComponent,
     PriceslabComponent,
+    BoardpasschangeComponent,
      ],
   imports: [
     BrowserModule,
@@ -132,7 +137,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     BrowserAnimationsModule
   ],
-  exports: [RouterModule, CompareDirective, VerifyPasswordDirective, PasswordResetDirective  ],
+  exports: [RouterModule, CompareDirective, VerifyPasswordDirective, PasswordResetDirective, BPassDirective  ],
   providers: [],
   bootstrap: [AppComponent]
 })
