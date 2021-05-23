@@ -884,7 +884,6 @@ app.post('/api/BillSlab', adminToken, function(req, res) {
         //         });
         //     });
     for (i = 0; i < data.length; i++) {
-        console.log(data[i]);
         UserRef.add({
             id: data[i].id,
             upto: data[i].from,
@@ -913,8 +912,7 @@ app.post('/api/MonthlyCharge', conAuth, function(req, res) {
     db.collection("ConDashboard").where("consumerid", "==", req.con).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
-                // month = doc.data().month
-                month = 102;
+                month = doc.data().month
             });
             let PRef = db.collection("Price").where("upto", "<", month).get()
                 .then((querySnapshot) => {
@@ -922,7 +920,6 @@ app.post('/api/MonthlyCharge', conAuth, function(req, res) {
                         price = doc.data().price;
                     });
                     fin = (month * price) + 30
-                    console.log(price, month)
                     res.status(200).json({ 'status': 1, 'charge': fin.toFixed(2) })
 
                 });
@@ -964,7 +961,7 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
                             use = doc.data().consumerid;
                             store.push(bt)
                         });
-                        if (store.length > 0) {
+                        if (store.length > 1) {
                             charges = 0;
                             charges = store[store.length - 1] - store[0];
                             let PRef = db.collection("Price").where("upto", "<", charges).get()
@@ -974,6 +971,7 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
                                         fixed = doc.data().fixed;
                                     });
                                     fin = (charges * price) + fixed;
+                                    console.log(use, charges, fin)
                                     db.collection("Bills").add({
                                         timestamp: now,
                                         billfrom: billf,
@@ -986,10 +984,13 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
                                         state: false
                                     })
                                 });
+                            store = [];
                         }
-                        store = [];
-                        con = "";
+
                     });
+                con = "";
+
+
             }
         });
     db.collection("BillRecord").add({
@@ -1086,7 +1087,7 @@ app.post('/api/SearchUser', authenticateToken, function(req, res) {
 app.post('/api/ProfileUser', authenticateToken, function(req, res) {
     var user = req.body.user;
     var userid = {}
-    state = 0;
+    var state = 0;
     try {
         db.collection("Users").where("board", "==", req.user).where("username", "<=", user).where("username", ">=", user).get()
             .then((querySnapshot) => {
@@ -1129,7 +1130,7 @@ app.post('/api/UserConsumption', authenticateToken, function(req, res) {
     var yesterday = admin.firestore.Timestamp.fromDate(date);
     var month = admin.firestore.Timestamp.fromDate(m);
     store = [];
-    state = 0;
+    var state = 0;
     let UserRef = db.collection("Consumption").where("board", "==", req.user).where("consumerid", "==", user)
     try {
         UserRef.where("date", "<=", today).where("date", ">=", yesterday).get()

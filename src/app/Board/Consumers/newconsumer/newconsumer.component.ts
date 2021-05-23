@@ -11,7 +11,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class NewconsumerComponent implements OnInit {
   personList: Array<any>;
-  act = 'active';
+  act = 'Active';
   inact = 'Inactive';
   options: Array<any>;
 
