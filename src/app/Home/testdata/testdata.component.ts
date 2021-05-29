@@ -20,4 +20,9 @@ export class TestdataComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  onDelete(){
+    this.http.post<any>(environment.url + '/api/RemoveTest', {}, {}).subscribe(result => {
+       });
+  }
+
 }

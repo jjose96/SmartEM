@@ -1313,4 +1313,19 @@ app.post("/api/GetTest", function(req, res) {
             });
         });
 });
+
+app.post('/api/RemoveTest', function(req, res) {
+    let UserRef = db.collection('TestTodayGraph')
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    doc.ref.delete();
+                }
+            });
+        });
+    res.status(200).json({
+        'status': 1
+    });
+});
 app.listen(process.env.PORT || 3000);
