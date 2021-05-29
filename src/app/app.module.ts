@@ -46,6 +46,7 @@ import { AddboardComponent } from './Administrator/addboard/addboard.component';
 import { PriceslabComponent } from './Administrator/priceslab/priceslab.component';
 import { BoardpasschangeComponent } from './Board/boardpasschange/boardpasschange.component';
 import { BPassDirective } from './Board/boardpasschange/boardpasschange.directive';
+import { TestdataComponent } from './Home/testdata/testdata.component';
 const routes: Routes = [
   { path: '', component: HomePageComponent, children: [
     { path: '', component: ConsumerComponent },
@@ -53,6 +54,7 @@ const routes: Routes = [
     { path: 'forgot', component: ForgotpassComponent },
     { path: 'passwordreset', component: PasswordresetComponent },
   ]},
+  {path: 'test', component: TestdataComponent},
   { path: 'dashboard', component: MergeComponent, children: [
     { path: '', component: DashboardComponent },
     { path: 'consumers', component: ConsumerallComponent, children: [
@@ -126,6 +128,7 @@ const routes: Routes = [
     AddboardComponent,
     PriceslabComponent,
     BoardpasschangeComponent,
+    TestdataComponent,
      ],
   imports: [
     BrowserModule,

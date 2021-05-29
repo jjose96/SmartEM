@@ -1240,4 +1240,77 @@ app.post('/api/RemoveCon', function(req, res) {
     });
 });
 
+
+app.post('/api/TestStatus', function(req, res) {
+    var board = req.body.board;
+    var consumerid = String(req.body.consumerid);
+    var unit = parseFloat(req.body.unit);
+    var state = 0;
+    var todate = new Date();
+    var condate = new Date();
+    todate.setHours(00);
+    todate.setMinutes(00);
+    todate.setSeconds(00);
+    condate.setDate(todate.getDate() - 1)
+    const todayAsTimestamp = admin.firestore.Timestamp.now()
+    var yesterday = admin.firestore.Timestamp.fromDate(todate)
+    var previous = admin.firestore.Timestamp.fromDate(condate)
+
+    let UserRef = db.collection('TestConsumption').where("consumerid", "==", consumerid)
+    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                if (doc.exists) {
+                    db.collection("TestConsumption").doc(doc.id).set({
+                        unit: unit,
+                        date: todayAsTimestamp,
+                    }, { merge: true });
+                }
+                state = 1;
+            });
+            if (state == 0) {
+                db.collection("TestConsumption").add({
+                    board: board,
+                    consumerid: consumerid,
+                    unit: unit,
+                    date: todayAsTimestamp,
+                });
+            }
+        });
+    db.collection('TestTodayGraph').where("date", "<", yesterday).get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    doc.ref.delete();
+                }
+            });
+        });
+
+    db.collection("TestTodayGraph").add({
+        board: board,
+        consumerid: consumerid,
+        unit: unit,
+        date: todayAsTimestamp,
+    });
+    res.status(200).json({ 'status': 1 });
+});
+
+
+app.post("/api/GetTest", function(req, res) {
+    let UserRef = db.collection('TestTodayGraph');
+    let Reading = []
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    let use = { "board": doc.data().board, "consumerid": doc.data().consumerid, "date": doc.data().date.toDate().toLocaleTimeString(), "unit": doc.data().unit }
+                    Reading.push(use);
+                }
+            });
+            res.status(200).json({
+                'status': 1,
+                Reading
+            });
+        });
+});
 app.listen(process.env.PORT || 3000);

@@ -1,0 +1,26 @@
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+
+    <h2>Test Meter Reading</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Consumerid</th>
+                    <th>Unit</th>
+                    <th>Date</th>
+                    <th>Board name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let x of ReadingList; let i=index">
+                    <td>{{i+1}}</td>
+                    <td>{{x.consumerid}}</td>
+                    <td>{{x.unit}}</td>
+                    <td>{{x.date}}</td>
+                    <td>{{x.board}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
