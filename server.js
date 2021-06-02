@@ -1004,7 +1004,7 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
     res.status(200).json({ 'status': 1 })
 
 });
-
+//bill record
 app.post('/api/BillRecord', authenticateToken, function(req, res) {
     store = [];
     db.collection("BillRecord").where("board", "==", req.user).orderBy("duedate").get()
