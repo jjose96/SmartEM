@@ -7,6 +7,7 @@
 
                 </div>
             </div>
+
             <div class="col-md-4">
                 <div class="profile-head">
                     <h4>
@@ -18,6 +19,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" id="profile-tab" data-toggle="tab" href="#usages" role="tab" aria-controls="usages" aria-selected="false">Usages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#pass" role="tab" aria-controls="pass" aria-selected="false">Device Key</a>
                         </li>
                     </ul>
                 </div>
@@ -102,10 +106,21 @@
                             </div>
                         </div>
                     </div>
+                    <div class="tab-pane fade" id="pass" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn btn-primary">Generate API Key</button>
+                            </div>
+                            <div class="col-md-6">
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
                     <p>
                         <a href="javascript:void(0)" (click)="goBack()" class="btn btn-warning">
                             Go back</a>
                     </p>
+
                 </div>
             </div>
         </div>

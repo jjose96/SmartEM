@@ -961,15 +961,15 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
                             use = doc.data().consumerid;
                             store.push(bt)
                         });
-                        charges = store[store.length - 1] - store[0];
-                        let PRef = db.collection("Price").where("upto", "<", charges).get()
-                            .then((querySnapshot) => {
-                                querySnapshot.forEach((doc) => {
-                                    price = doc.data().price;
-                                    fixed = doc.data().fixed;
-                                });
-                                if (store.length > 1) {
-                                    console.log(use, charges)
+                        if (store.length > 1) {
+                            charges = 0;
+                            charges = store[store.length - 1] - store[0];
+                            let PRef = db.collection("Price").where("upto", "<", charges).get()
+                                .then((querySnapshot) => {
+                                    querySnapshot.forEach((doc) => {
+                                        price = doc.data().price;
+                                        fixed = doc.data().fixed;
+                                    });
                                     fin = (charges * price) + fixed;
                                     console.log(use, charges, fin)
                                     db.collection("Bills").add({
@@ -983,10 +983,10 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
                                         board: req.user,
                                         state: false
                                     })
+                                });
+                            store = [];
+                        }
 
-                                    store = [];
-                                }
-                            });
                     });
                 con = "";
 
@@ -1004,7 +1004,6 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
     res.status(200).json({ 'status': 1 })
 
 });
-//bill record
 app.post('/api/BillRecord', authenticateToken, function(req, res) {
     store = [];
     db.collection("BillRecord").where("board", "==", req.user).orderBy("duedate").get()
