@@ -43,6 +43,7 @@
     "rxjs": "~6.5.4",
     "sendmail": "^1.6.1",
     "tslib": "^1.10.0",
+    "uuid-token-generator": "^1.0.0",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {

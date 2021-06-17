@@ -5,6 +5,7 @@ const app = express();
 const jwt = require('jsonwebtoken');
 const sendmail = require('sendmail')();
 const nodemailer = require("nodemailer");
+const TokenGenerator = require('uuid-token-generator');
 app.use(cors());
 const body_parser = require('body-parser');
 app.use(body_parser.json());
@@ -1208,11 +1209,11 @@ app.post('/api/UsersPending', authenticateToken, function(req, res) {
         res.status(200).send({ userp: c });
     });
 });
-app.post('/api/LastDue', function(req, res) {
+app.post('/api/LastDue', authenticateToken, function(req, res) {
     c = 0;
     store = []
     today = admin.firestore.Timestamp.now();
-    let UserRef = db.collection("BillRecord").where("board", "==", "kalanjoor")
+    let UserRef = db.collection("BillRecord").where("board", "==", req.user)
     UserRef.orderBy("duedate").get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
@@ -1223,7 +1224,24 @@ app.post('/api/LastDue', function(req, res) {
         })
 
 });
+app.post('/api/generateKey', authenticateToken, function(req, res) {
+    consumerid = req.body.consumedId;
+    const tokgen = new TokenGenerator(); // Default is a 128-bit token encoded in base58
+    var token = tokgen.generate();
+    let UserRef = db.collection("Users").where("board", "==", req.user).where("username", "==", consumerid)
+    UserRef.get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                if (doc.exists) {
+                    db.collection("Users").doc(doc.id).set({
+                        dpass: token,
+                    }, { merge: true });
+                }
 
+            });
+            res.status(200).send({ status: 1, dpass: token });
+        });
+});
 app.post('/api/RemoveCon', function(req, res) {
     let UserRef = db.collection('Consumption').where("board", "==", "kalanjoor").where("consumerid", "==", "4347387431");
     UserRef.get()
@@ -1242,6 +1260,7 @@ app.post('/api/RemoveCon', function(req, res) {
 
 app.post('/api/TestStatus', function(req, res) {
     var board = req.body.board;
+    var dpass = req.body.dpass;
     var consumerid = String(req.body.consumerid);
     var unit = parseFloat(req.body.unit);
     var state = 0;
@@ -1254,43 +1273,50 @@ app.post('/api/TestStatus', function(req, res) {
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var yesterday = admin.firestore.Timestamp.fromDate(todate)
     var previous = admin.firestore.Timestamp.fromDate(condate)
-
+    let ReRef = db.collection('Users').where("username", "==", consumerid).where("dpass", "==", dpass)
     let UserRef = db.collection('TestConsumption').where("consumerid", "==", consumerid)
-    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
+    ReRef.get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 if (doc.exists) {
-                    db.collection("TestConsumption").doc(doc.id).set({
+                    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
+                        .then((querySnapshot) => {
+                            querySnapshot.forEach((doc) => {
+                                if (doc.exists) {
+                                    db.collection("TestConsumption").doc(doc.id).set({
+                                        unit: unit,
+                                        date: todayAsTimestamp,
+                                    }, { merge: true });
+                                }
+                                state = 1;
+                            });
+                            if (state == 0) {
+                                db.collection("TestConsumption").add({
+                                    board: board,
+                                    consumerid: consumerid,
+                                    unit: unit,
+                                    date: todayAsTimestamp,
+                                });
+                            }
+                        });
+                    db.collection('TestTodayGraph').where("date", "<", yesterday).get()
+                        .then(function(q) {
+                            q.forEach(function(doc) {
+                                if (doc.exists) {
+                                    doc.ref.delete();
+                                }
+                            });
+                        });
+
+                    db.collection("TestTodayGraph").add({
+                        board: board,
+                        consumerid: consumerid,
                         unit: unit,
                         date: todayAsTimestamp,
-                    }, { merge: true });
-                }
-                state = 1;
-            });
-            if (state == 0) {
-                db.collection("TestConsumption").add({
-                    board: board,
-                    consumerid: consumerid,
-                    unit: unit,
-                    date: todayAsTimestamp,
-                });
-            }
-        });
-    db.collection('TestTodayGraph').where("date", "<", yesterday).get()
-        .then(function(q) {
-            q.forEach(function(doc) {
-                if (doc.exists) {
-                    doc.ref.delete();
+                    });
                 }
             });
         });
-
-    db.collection("TestTodayGraph").add({
-        board: board,
-        consumerid: consumerid,
-        unit: unit,
-        date: todayAsTimestamp,
-    });
     res.status(200).json({ 'status': 1 });
 });
 

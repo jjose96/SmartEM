@@ -21,6 +21,7 @@ daily;
 month;
 reading;
 status;
+tok = '';
   constructor(private http: HttpClient, private location: Location) {
     const userid = window.location.pathname.split('/').pop();
     const token = localStorage.getItem('token');
@@ -57,6 +58,23 @@ this.reading = result.reading;
      if (result.status === 1){
        location.href = '/dashboard/consumers/';
      }
+    });
+
+    }
+  }
+
+  generateKey() {
+    const use = prompt('Enter "CONFIRM" to confirm action');
+    if (use === 'CONFIRM'){
+     const data = window.location.pathname.split('/').pop();
+     const token = localStorage.getItem('token');
+     let headers = new HttpHeaders();
+     headers = headers.set('Authorization', 'Bearer ' + token);
+     this.http.post<any>(environment.url + '/api/generateKey', {consumedId: data}, {headers}).subscribe(result => {
+     // tslint:disable-next-line:triple-equals
+     if (result.status == 1){
+        this.tok = result.dpass;
+      }
     });
 
     }

@@ -109,10 +109,10 @@
                     <div class="tab-pane fade" id="pass" role="tabpanel" aria-labelledby="profile-tab">
                         <div class="row">
                             <div class="col-md-6">
-                                <button class="btn btn-primary">Generate API Key</button>
+                                <button class="btn btn-primary" (click)="generateKey()">Generate API Key</button>
                             </div>
                             <div class="col-md-6">
-                                <p></p>
+                                <p>{{tok}}</p>
                             </div>
                         </div>
                     </div>
