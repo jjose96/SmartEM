@@ -36,8 +36,8 @@ app.get('/*', function(req, res) {
 var transporter = nodemailer.createTransport({
     service: "FastMail",
     auth: {
-        user: "smartem@fastmail.com",
-        pass: "a2dy9uchfzhqnbs9"
+        user: "smartem1@fastmail.com",
+        pass: "wepcllmqjbkmrmf6"
     }
 });
 const accessTokenSecret = 'youraccesstokensecret';
@@ -81,7 +81,7 @@ cron.schedule('0 */1 * * *', () => {
                                 if (today > doc.data().limit && doc.data().limit != 0) {
                                     console.log("send");
                                     const mailOptions = {
-                                        from: 'smartem@fastmail.com',
+                                        from: 'smartem1@fastmail.com',
                                         to: doc.data().email,
                                         subject: 'Usage Warning',
                                         html: 'Hi, <br> Warning your daily usage exceeds. You will receive this warning every 1 hour. In order turn off, log in to the application and set the limit to 0. <br> Thank you' // plain text body
@@ -316,7 +316,7 @@ app.post('/api/ConsumerReg', authenticateToken, function(req, res) {
                 });
                 let accessToken = jwt.sign({ userid: username }, verifyTokenSecret);
                 const mailOptions = {
-                    from: 'smartem@fastmail.com', // sender address
+                    from: 'smartem1@fastmail.com', // sender address
                     to: email, // list of receivers
                     subject: 'Verify User', // Subject line
                     html: 'Hi, <br><p>Thank you for registering your account.<br>Please verify email and setup you account: https://smarte.herokuapp.com/verify?token=' + accessToken + '</p><br> Thank you' // plain text body
@@ -458,7 +458,7 @@ app.post("/api/forgot", function(req, res) {
             });
             let accessToken = jwt.sign({ userid: consumerid }, ForgotToken, { expiresIn: '1h' });
             const mailOptions = {
-                from: 'smartem@fastmail.com',
+                from: 'smartem1@fastmail.com',
                 to: email,
                 subject: 'SMARTEM: Forgot my password request',
                 html: 'Hi, <br> As per your request, you are getting a password reset link. Use the password reset link to reset the password <br> https://smarte.herokuapp.com/passwordreset?token=' + accessToken + '<br>Thank you' // plain text body
@@ -1352,5 +1352,67 @@ app.post('/api/RemoveTest', function(req, res) {
     res.status(200).json({
         'status': 1
     });
+});
+
+app.post('/api/getData', function(req, res) {
+    var board = req.body.board;
+    var dpass = req.body.dpass;
+    var consumerid = String(req.body.consumerid);
+    var unit = parseFloat(req.body.unit);
+    var state = 0;
+    var todate = new Date();
+    var condate = new Date();
+    todate.setHours(00);
+    todate.setMinutes(00);
+    todate.setSeconds(00);
+    condate.setDate(todate.getDate() - 1)
+    const todayAsTimestamp = admin.firestore.Timestamp.now()
+    var yesterday = admin.firestore.Timestamp.fromDate(todate)
+    var previous = admin.firestore.Timestamp.fromDate(condate)
+    let ReRef = db.collection('Users').where("username", "==", consumerid).where("dpass", "==", dpass)
+    let UserRef = db.collection('Consumption').where("consumerid", "==", consumerid)
+    ReRef.get()
+        .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                if (doc.exists) {
+                    UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
+                        .then((querySnapshot) => {
+                            querySnapshot.forEach((doc) => {
+                                if (doc.exists) {
+                                    db.collection("Consumption").doc(doc.id).set({
+                                        unit: unit,
+                                        date: todayAsTimestamp,
+                                    }, { merge: true });
+                                }
+                                state = 1;
+                            });
+                            if (state == 0) {
+                                db.collection("Consumption").add({
+                                    board: board,
+                                    consumerid: consumerid,
+                                    unit: unit,
+                                    date: todayAsTimestamp,
+                                });
+                            }
+                        });
+                    db.collection('TodayGraph').where("date", "<", yesterday).get()
+                        .then(function(q) {
+                            q.forEach(function(doc) {
+                                if (doc.exists) {
+                                    doc.ref.delete();
+                                }
+                            });
+                        });
+
+                    db.collection("TodayGraph").add({
+                        board: board,
+                        consumerid: consumerid,
+                        unit: unit,
+                        date: todayAsTimestamp,
+                    });
+                }
+            });
+        });
+    res.status(200).json({ 'status': 1 });
 });
 app.listen(process.env.PORT || 3000);
