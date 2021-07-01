@@ -163,4 +163,4 @@ setTimeout(function() {
         });
         hideMaterialList($('.select'));
     })
-}, 4000);
+}, 1000);
