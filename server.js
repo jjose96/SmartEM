@@ -674,10 +674,11 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     n = m.getDate()
     m.setHours(00);
     m.setMinutes(00);
-    m.setDate(m.getDate() - n + 1);
+    m.setDate(m.getDate() - n);
     var m = new Date(m.getTime() - m.getTimezoneOffset() * 60000)
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var yesterday = admin.firestore.Timestamp.fromDate(d)
+    console.log(m)
     var month = admin.firestore.Timestamp.fromDate(m)
     let UserRef = db.collection('Consumption').where("consumerid", "==", req.con)
     UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
@@ -1155,23 +1156,27 @@ app.post('/api/UserConsumption', authenticateToken, function(req, res) {
 
 app.post('/api/LastBoard', authenticateToken, function(req, res) {
     var d = new Date();
-    var n = d.getDate() + 1;
+    var s = d.getDate();
+    var n = d.getDate();
     var w = d.getDate() - 7;
-    var qw = new Date();
     c = -1;
-    var qe = new Date();
+    i = 0;
     while (w < n) {
-        n--;
-        qw.setDate(n);
+        n = s - i
+        i++;
+        var qw = new Date()
+        var qe = new Date()
+        qw.setDate(n)
         qw.setHours(23)
         qw.setMinutes(59)
         qw.setSeconds(59);
+        qe.setDate(n)
         qe.setHours(0);
-        qe.setDate(n);
         qe.setMinutes(0);
         qe.setSeconds(0);
         var up = new Date(qw.getTime() - qw.getTimezoneOffset() * 60000);
         var down = new Date(qe.getTime() - qe.getTimezoneOffset() * 60000);
+        console.log(up, down);
         var from = admin.firestore.Timestamp.fromDate(down);
         var to = admin.firestore.Timestamp.fromDate(up);
         storea = []
