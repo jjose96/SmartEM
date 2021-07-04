@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
-
+import * as $ from 'jquery';
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
@@ -25,7 +25,37 @@ OnLogout(){
   localStorage.removeItem('user');
   location.replace('/board');
 }
-  ngOnInit(): void {
+  ngOnInit(){
+    $('.sidebar-dropdown > a').click(function() {
+      $('.sidebar-submenu').slideUp(200);
+      if (
+          $(this)
+          .parent()
+          .hasClass('active')
+      ) {
+          $('.sidebar-dropdown').removeClass('active');
+          $(this)
+              .parent()
+              .removeClass('active');
+      } else {
+          $('.sidebar-dropdown').removeClass('active');
+          $(this)
+              .next('.sidebar-submenu')
+              .slideDown(200);
+          $(this)
+              .parent()
+              .addClass('active');
+      }
+  });
+
+    // tslint:disable-next-line:only-arrow-functions
+    $('#close-sidebar').click(function() {
+      $('.page-wrapper').removeClass('toggled');
+  });
+    // tslint:disable-next-line:only-arrow-functions
+    $('#show-sidebar').click(function() {
+      $('.page-wrapper').addClass('toggled');
+  });
 
     }
 
