@@ -79,7 +79,6 @@ cron.schedule('0 */1 * * *', () => {
                         LimitRef.get().then((doc) => {
                             if (doc.exists) {
                                 if (today > doc.data().limit && doc.data().limit != 0) {
-                                    console.log("send");
                                     const mailOptions = {
                                         from: 'smartem1@fastmail.com',
                                         to: doc.data().email,
@@ -678,7 +677,6 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     var m = new Date(m.getTime() - m.getTimezoneOffset() * 60000)
     const todayAsTimestamp = admin.firestore.Timestamp.now()
     var yesterday = admin.firestore.Timestamp.fromDate(d)
-    console.log(m)
     var month = admin.firestore.Timestamp.fromDate(m)
     let UserRef = db.collection('Consumption').where("consumerid", "==", req.con)
     UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", yesterday).get()
@@ -869,7 +867,6 @@ app.post("/api/MonthlyChart", conAuth, function(req, res) {
 app.post('/api/Date', function(req, res) {
     const v = new Date()
     v.setHours(0)
-    console.log(v);
     var d = new Date(v.getTime() - v.getTimezoneOffset() * 60000)
     res.status(200).json({ 'status': 1, 'date': d })
 });
@@ -973,7 +970,6 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
                                         fixed = doc.data().fixed;
                                     });
                                     fin = (charges * price) + fixed;
-                                    console.log(use, charges, fin)
                                     db.collection("Bills").add({
                                         timestamp: now,
                                         billfrom: billf,
@@ -1176,7 +1172,6 @@ app.post('/api/LastBoard', authenticateToken, function(req, res) {
         qe.setSeconds(0);
         var up = new Date(qw.getTime() - qw.getTimezoneOffset() * 60000);
         var down = new Date(qe.getTime() - qe.getTimezoneOffset() * 60000);
-        console.log(up, down);
         var from = admin.firestore.Timestamp.fromDate(down);
         var to = admin.firestore.Timestamp.fromDate(up);
         storea = []
