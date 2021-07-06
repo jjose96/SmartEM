@@ -686,26 +686,28 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
                 storeday.push(doc.data().unit)
             });
             todayunit = storeday[storeday.length - 1] - storeday[storeday.length - 2];
-            UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        lastm = doc.data().unit
-                    });
-                    monthunit = storeday[storeday.length - 1] - lastm;
-                    db.collection("ConDashboard").where("consumerid", "==", req.con).get()
-                        .then(function(q) {
-                            q.forEach(function(doc) {
-                                if (doc.exists) {
-                                    db.collection('ConDashboard').doc(doc.id).set({
-                                        today: todayunit,
-                                        month: monthunit
-                                    }, { merge: true })
-                                }
-                            });
+            try {
+                UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            lastm = doc.data().unit
                         });
+                        monthunit = storeday[storeday.length - 1] - lastm;
+                        db.collection("ConDashboard").where("consumerid", "==", req.con).get()
+                            .then(function(q) {
+                                q.forEach(function(doc) {
+                                    if (doc.exists) {
+                                        db.collection('ConDashboard').doc(doc.id).set({
+                                            today: todayunit,
+                                            month: monthunit
+                                        }, { merge: true })
+                                    }
+                                });
+                            });
 
 
-                });
+                    });
+            } catch (e) {}
         });
 
 
@@ -914,16 +916,19 @@ app.post('/api/MonthlyCharge', conAuth, function(req, res) {
             querySnapshot.forEach((doc) => {
                 month = doc.data().month
             });
-            let PRef = db.collection("Price").where("upto", "<", month).get()
-                .then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        price = doc.data().price;
+            try {
+                let PRef = db.collection("Price").where("upto", "<", month).get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            price = doc.data().price;
+                        });
+                        fin = (month * price) + 30
+                        res.status(200).json({ 'status': 1, 'charge': fin.toFixed(2) })
+
                     });
-                    fin = (month * price) + 30
-                    res.status(200).json({ 'status': 1, 'charge': fin.toFixed(2) })
+            } catch (e) {
 
-                });
-
+            }
         });
 });
 
