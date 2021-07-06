@@ -447,6 +447,7 @@ app.post("/api/userInfo", conAuth, function(req, res) {
 
 app.post("/api/forgot", function(req, res) {
     consumerid = req.body.consumerid;
+    email = "";
     let UserRef = db.collection('Users').where("username", "==", consumerid);
     UserRef.get()
         .then(function(q) {
