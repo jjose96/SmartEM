@@ -674,7 +674,6 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     n = m.getDate()
     m.setHours(00);
     m.setMinutes(00);
-    lastm = 0
     m.setDate(m.getDate() - n);
     var m = new Date(m.getTime() - m.getTimezoneOffset() * 60000)
     const todayAsTimestamp = admin.firestore.Timestamp.now()
