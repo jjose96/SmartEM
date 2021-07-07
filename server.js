@@ -1428,4 +1428,20 @@ app.post('/api/getData', function(req, res) {
         });
     res.status(200).json({ 'status': 1 });
 });
+
+app.post('/api/RemoveBoard', adminToken, function(req, res) {
+    var board = req.body.board;
+    let UserRef = db.collection('BoardUsers').where("user", "==", board)
+    UserRef.get()
+        .then(function(q) {
+            q.forEach(function(doc) {
+                if (doc.exists) {
+                    doc.ref.delete();
+                }
+            });
+        });
+    res.status(200).json({
+        'status': 1
+    });
+});
 app.listen(process.env.PORT || 3000);

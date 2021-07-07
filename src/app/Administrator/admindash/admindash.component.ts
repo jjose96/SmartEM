@@ -18,7 +18,20 @@ export class AdmindashComponent implements OnInit {
        this.personList = result.Users;
         });
    }
-
+   RemoveB(data){
+    const use = prompt('Enter "CONFIRM" to confirm action');
+    if (use === 'CONFIRM'){
+      const token = localStorage.getItem('token');
+      let headers = new HttpHeaders();
+      headers = headers.set('Authorization', 'Bearer ' + token);
+      this.http.post<any>(environment.url + '/api/RemoveBoard', {board: data}, {headers}).subscribe(result => {
+        // tslint:disable-next-line:triple-equals
+        if (result.status == 1){
+          location.reload();
+        }
+        });
+      }
+   }
   ngOnInit(): void {
   }
 
