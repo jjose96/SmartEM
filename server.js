@@ -666,7 +666,7 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
     let storeday = []
     let storemonth = []
     let todayunit;
-    d.setDate(d.getDate() - 2);
+    d.setDate(d.getDate() - 5);
     d.setHours(00);
     d.setMinutes(00);
     d.setSeconds(00);
@@ -685,6 +685,9 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
             querySnapshot.forEach((doc) => {
                 storeday.push(doc.data().unit)
             });
+            if (storeday[storeday.length - 2] == undefined) {
+                storeday[storeday.length - 2] = 0;
+            }
             todayunit = storeday[storeday.length - 1] - storeday[storeday.length - 2];
             try {
                 UserRef.where("date", "<=", todayAsTimestamp).where("date", ">=", month).orderBy("date").limit(1).get()
@@ -692,6 +695,9 @@ app.post('/api/ConsumerDashboard', conAuth, function(req, res) {
                         querySnapshot.forEach((doc) => {
                             lastm = doc.data().unit
                         });
+                        if (lastm == undefined) {
+                            lastm = 0;
+                        }
                         monthunit = storeday[storeday.length - 1] - lastm;
                         db.collection("ConDashboard").where("consumerid", "==", req.con).get()
                             .then(function(q) {
@@ -911,6 +917,7 @@ app.post('/api/SlabRemove', adminToken, function(req, res) {
 });
 app.post('/api/MonthlyCharge', conAuth, function(req, res) {
     month = 0;
+    price = 0;
     db.collection("ConDashboard").where("consumerid", "==", req.con).get()
         .then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
