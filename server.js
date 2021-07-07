@@ -966,7 +966,7 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
             });
             for (i = 0; i < users.length; i++) {
                 con = users[i];
-                BillRef.where("consumerid", "==", con).where("date", ">=", billf).where("date", "<=", billt).get()
+                BillRef.where("consumerid", "==", con).where("date", ">=", billf).where("date", "<=", billt).where("bill", "==", 1).get()
                     .then((querySnapshot) => {
                         querySnapshot.forEach((doc) => {
                             bt = doc.data().unit
