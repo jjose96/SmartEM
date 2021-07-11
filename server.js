@@ -1004,13 +1004,13 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
 
             }
         });
-    // db.collection("BillRecord").add({
-    //     timestamp: now,
-    //     billfrom: billf,
-    //     billto: billt,
-    //     board: req.user,
-    //     duedate: duedate
-    // })
+    db.collection("BillRecord").add({
+        timestamp: now,
+        billfrom: billf,
+        billto: billt,
+        board: req.user,
+        duedate: duedate
+    })
 
     res.status(200).json({ 'status': 1 })
 
