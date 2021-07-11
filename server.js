@@ -36,8 +36,8 @@ app.get('/*', function(req, res) {
 var transporter = nodemailer.createTransport({
     service: "FastMail",
     auth: {
-        user: "smartem1@fastmail.com",
-        pass: "wepcllmqjbkmrmf6"
+        user: "smartem2@fastmail.com",
+        pass: "hy5c4vu7hmgsy5x6"
     }
 });
 const accessTokenSecret = 'youraccesstokensecret';
@@ -80,7 +80,7 @@ cron.schedule('0 */1 * * *', () => {
                             if (doc.exists) {
                                 if (today > doc.data().limit && doc.data().limit != 0) {
                                     const mailOptions = {
-                                        from: 'smartem1@fastmail.com',
+                                        from: 'smartem2@fastmail.com',
                                         to: doc.data().email,
                                         subject: 'Usage Warning',
                                         html: 'Hi, <br> Warning your daily usage exceeds. You will receive this warning every 1 hour. In order turn off, log in to the application and set the limit to 0. <br> Thank you' // plain text body
@@ -315,7 +315,7 @@ app.post('/api/ConsumerReg', authenticateToken, function(req, res) {
                 });
                 let accessToken = jwt.sign({ userid: username }, verifyTokenSecret);
                 const mailOptions = {
-                    from: 'smartem1@fastmail.com', // sender address
+                    from: 'smartem2@fastmail.com', // sender address
                     to: email, // list of receivers
                     subject: 'Verify User', // Subject line
                     html: 'Hi, <br><p>Thank you for registering your account.<br>Please verify email and setup you account: https://smarte.herokuapp.com/verify?token=' + accessToken + '</p><br> Thank you' // plain text body
@@ -458,7 +458,7 @@ app.post("/api/forgot", function(req, res) {
             });
             let accessToken = jwt.sign({ userid: consumerid }, ForgotToken, { expiresIn: '1h' });
             const mailOptions = {
-                from: 'smartem1@fastmail.com',
+                from: 'smartem2@fastmail.com',
                 to: email,
                 subject: 'SMARTEM: Forgot my password request',
                 html: 'Hi, <br> As per your request, you are getting a password reset link. Use the password reset link to reset the password <br> https://smarte.herokuapp.com/passwordreset?token=' + accessToken + '<br>Thank you' // plain text body
