@@ -964,16 +964,16 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
             q.forEach(function(doc) {
                 users.push(doc.data().username);
             });
-            for (i = 0; i < users.length; i++) {
+            for (i = 0; i < 1; i++) {
                 con = users[i];
-                BillRef.where("consumerid", "==", con).where("date", ">=", billf).where("date", "<=", billt).where("bill", "==", 1).get()
+                BillRef.where("consumerid", "==", "123456789").where("date", ">=", billf).where("date", "<=", billt).get()
                     .then((querySnapshot) => {
                         querySnapshot.forEach((doc) => {
                             bt = doc.data().unit
                             use = doc.data().consumerid;
                             store.push(bt)
                         });
-                        if (store.length > 1) {
+                        if (store.length > 0) {
                             charges = 0;
                             charges = store[store.length - 1] - store[0];
                             let PRef = db.collection("Price").where("upto", "<", charges).get()
@@ -1004,13 +1004,13 @@ app.post('/api/IssueBill', authenticateToken, function(req, res) {
 
             }
         });
-    db.collection("BillRecord").add({
-        timestamp: now,
-        billfrom: billf,
-        billto: billt,
-        board: req.user,
-        duedate: duedate
-    })
+    // db.collection("BillRecord").add({
+    //     timestamp: now,
+    //     billfrom: billf,
+    //     billto: billt,
+    //     board: req.user,
+    //     duedate: duedate
+    // })
 
     res.status(200).json({ 'status': 1 })
 
