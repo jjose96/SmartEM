@@ -788,7 +788,7 @@ app.post("/api/DailyChart", conAuth, function(req, res) {
                     break;
                 }
 
-                c = store[n + 1] - store[n]
+                c = Math.abs(store[n + 1] - store[n])
                 p = record[n + 1]['y'] = c.toFixed(2);
                 n = n + 1
                 if (n > store.length) {
